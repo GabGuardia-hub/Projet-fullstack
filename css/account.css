@@ -207,6 +207,10 @@ body {
     flex-shrink: 0;
 }
 
+.nav-link.logout {
+    color: var(--color-danger-fg);
+}
+
 .nav-link.active .nav-icon {
     stroke: var(--color-fg-default);
 }

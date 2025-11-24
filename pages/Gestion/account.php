@@ -1,11 +1,14 @@
+<?php require('../../backend/account.php'); ?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paramètres du Compte</title>
-    <link rel="stylesheet" href="../CSS/style.css">
-    <link rel="stylesheet" href="../CSS/account.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/account.css">
 </head>
 <body>
     <!-- Theme Toggle Button (Top Right) -->
@@ -43,7 +46,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#account" class="nav-link active" onclick="showSection('account')">
+                            <a href="#account.php" class="nav-link active" onclick="showSection('account')">
                                 <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <circle cx="12" cy="12" r="3"/>
                                     <path d="M12 1v6m0 6v6m8.66-13.66l-4.24 4.24m-4.84 4.84l-4.24 4.24M23 12h-6m-6 0H1m17.66 8.66l-4.24-4.24m-4.84-4.84l-4.24-4.24"/>
@@ -100,6 +103,16 @@
                                     <line x1="12" y1="17" x2="12" y2="21"/>
                                 </svg>
                                 Sessions
+                            </a>
+                        </li> 
+                        <li class="nav-item">
+                            <a href="../../backend/logout.php" class="nav-link logout" style="color:#e53935;" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?');">
+                                <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                Deconnexion
                             </a>
                         </li>
                     </ul>
@@ -432,6 +445,6 @@
         </main>
     </div>
 
-    <script src="../JS/script.js"></script>
+    <script src="../../js/script.js"></script>
 </body>
 </html>

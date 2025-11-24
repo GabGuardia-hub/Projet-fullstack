@@ -1,55 +1,108 @@
 /* GAB ACCOUNT SCRIPT */
 // ============= THEME MANAGEMENT =============
+// script.js - GitHub-style Account Settings
+
+// ============= THEME MANAGEMENT =============
 function toggleTheme() {
     const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme');
+    const currentTheme = html.getAttribute('data-theme') || 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    
-    // Animation du bouton
-    const btn = document.getElementById('themeToggle');
-    if (btn) {
-        btn.style.transform = 'scale(0.9) rotate(180deg)';
-        setTimeout(() => {
-            btn.style.transform = 'scale(1) rotate(0deg)';
-        }, 300);
-    }
+    setTheme(newTheme);
 }
 
-// Charger le thème sauvegardé au chargement de la page
+function setTheme(theme) {
+    const html = document.documentElement;
+    
+    if (theme === 'auto') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    } else {
+        html.setAttribute('data-theme', theme);
+    }
+    
+    localStorage.setItem('theme', theme);
+    
+    // Update radio buttons
+    const themeRadios = document.querySelectorAll('input[name="theme"]');
+    themeRadios.forEach(radio => {
+        radio.checked = radio.value === theme;
+    });
+}
+
+// Load saved theme on page load
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    setTheme(savedTheme);
+    
+    // Listen for system theme changes if auto is selected
+    if (savedTheme === 'auto') {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (localStorage.getItem('theme') === 'auto') {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+            }
+        });
+    }
 });
 
-// ============= TAB NAVIGATION =============
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active');
+// ============= NAVIGATION =============
+function showSection(sectionId) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none';
     });
     
-    document.getElementById(tabId).classList.add('active');
-    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+    // Remove active class from all nav links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Show selected section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        targetSection.style.display = 'block';
+    }
+    
+    // Add active class to clicked nav link
+    const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+    
+    // Update URL without page reload
+    history.pushState(null, '', `#${sectionId}`);
+    
+    // Prevent default link behavior
+    event?.preventDefault();
 }
+
+// Handle back/forward browser navigation
+window.addEventListener('popstate', () => {
+    const hash = window.location.hash.replace('#', '') || 'account';
+    showSection(hash);
+});
+
+// Load correct section on page load based on URL hash
+document.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash.replace('#', '') || 'account';
+    showSection(hash);
+});
 
 // ============= AVATAR UPLOAD =============
 document.addEventListener('DOMContentLoaded', () => {
-    const avatarInput = document.getElementById('avatarInput');
-    const avatarDisplay = document.getElementById('avatarDisplay');
+    const avatarUpload = document.getElementById('avatarUpload');
+    const profileAvatar = document.getElementById('profileAvatar');
     
-    if (avatarInput && avatarDisplay) {
-        avatarInput.addEventListener('change', function(e) {
+    if (avatarUpload && profileAvatar) {
+        avatarUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    avatarDisplay.src = e.target.result;
-                    showNotification('Photo de profil mise à jour !', 'success');
+                    profileAvatar.src = e.target.result;
+                    showNotification('Photo de profil mise à jour', 'success');
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -59,16 +112,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ============= FORM MANAGEMENT =============
-function savePersonalInfo() {
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const email = document.getElementById('emailField').value;
-    const phone = document.getElementById('phoneField').value;
-    const birthdate = document.getElementById('birthdateField').value;
-    const address = document.getElementById('addressField').value;
-    const city = document.getElementById('cityField').value;
-    const postal = document.getElementById('postalField').value;
+// ============= FORM HANDLERS =============
+function saveProfile() {
+    const username = document.getElementById('username')?.value;
+    const bio = document.getElementById('bio')?.value;
+    const website = document.getElementById('website')?.value;
+    
+    if (!username) {
+        showNotification('Le nom d\'utilisateur est requis', 'error');
+        return;
+    }
+    
+    console.log('Profile data:', { username, bio, website });
+    showNotification('Profil mis à jour avec succès', 'success');
+}
+
+function saveAccount() {
+    const firstName = document.getElementById('firstName')?.value;
+    const lastName = document.getElementById('lastName')?.value;
+    const email = document.getElementById('accountEmail')?.value;
     
     if (!firstName || !lastName || !email) {
         showNotification('Veuillez remplir tous les champs obligatoires', 'error');
@@ -80,94 +142,85 @@ function savePersonalInfo() {
         return;
     }
     
-    const userData = {
-        firstName,
-        lastName,
-        email,
-        phone,
-        birthdate,
-        address,
-        city,
-        postal
-    };
-    
-    console.log('Données à sauvegarder:', userData);
-    
-    document.getElementById('displayName').textContent = `${firstName} ${lastName}`;
-    document.getElementById('displayEmail').textContent = email;
-    
-    showNotification('Informations mises à jour avec succès !', 'success');
+    console.log('Account data:', { firstName, lastName, email });
+    showNotification('Informations du compte enregistrées', 'success');
 }
 
-function resetForm() {
-    document.querySelectorAll('.info-form input').forEach(input => {
-        input.value = '';
+function resetAccountForm() {
+    document.querySelectorAll('#account input').forEach(input => {
+        if (input.type !== 'button' && input.type !== 'submit') {
+            input.value = '';
+        }
     });
     showNotification('Formulaire réinitialisé', 'info');
 }
 
-// ============= PASSWORD MANAGEMENT =============
 function updatePassword() {
-    const currentPass = document.getElementById('currentPassword').value;
-    const newPass = document.getElementById('newPassword').value;
-    const confirmPass = document.getElementById('confirmPassword').value;
+    const oldPassword = document.getElementById('oldPassword')?.value;
+    const newPassword = document.getElementById('newPassword')?.value;
+    const confirmPassword = document.getElementById('confirmPassword')?.value;
     
-    if (!currentPass || !newPass || !confirmPass) {
+    if (!oldPassword || !newPassword || !confirmPassword) {
         showNotification('Veuillez remplir tous les champs', 'error');
         return;
     }
     
-    if (newPass !== confirmPass) {
+    if (newPassword !== confirmPassword) {
         showNotification('Les mots de passe ne correspondent pas', 'error');
         return;
     }
     
-    if (newPass.length < 8) {
+    if (newPassword.length < 8) {
         showNotification('Le mot de passe doit contenir au moins 8 caractères', 'error');
         return;
     }
     
-    if (!validatePassword(newPass)) {
+    if (!validatePassword(newPassword)) {
         showNotification('Le mot de passe doit contenir des majuscules et des chiffres', 'error');
         return;
     }
     
-    console.log('Changement de mot de passe');
-    
-    document.getElementById('currentPassword').value = '';
+    console.log('Password changed');
+    document.getElementById('oldPassword').value = '';
     document.getElementById('newPassword').value = '';
     document.getElementById('confirmPassword').value = '';
     
-    showNotification('Mot de passe modifié avec succès !', 'success');
+    showNotification('Mot de passe modifié avec succès', 'success');
 }
 
 // ============= SESSION MANAGEMENT =============
 function revokeSession(sessionId) {
     if (confirm('Voulez-vous vraiment révoquer cette session ?')) {
-        console.log('Session révoquée:', sessionId);
-        showNotification('Session révoquée avec succès', 'success');
+        console.log('Session revoked:', sessionId);
+        showNotification('Session révoquée', 'success');
     }
 }
 
-// ============= ACCOUNT MANAGEMENT =============
-function deactivateAccount() {
-    if (confirm('Êtes-vous sûr de vouloir désactiver votre compte ? Vous pourrez le réactiver plus tard.')) {
-        console.log('Compte désactivé');
-        showNotification('Compte désactivé', 'warning');
+// ============= ACCOUNT ACTIONS =============
+function addEmail() {
+    const email = prompt('Entrez une nouvelle adresse email :');
+    if (email && validateEmail(email)) {
+        console.log('Adding email:', email);
+        showNotification('Email ajouté avec succès', 'success');
+    } else if (email) {
+        showNotification('Adresse email invalide', 'error');
     }
 }
 
 function deleteAccount() {
-    const confirmation = confirm('⚠️ ATTENTION : Cette action est irréversible !\n\nVoulez-vous vraiment supprimer définitivement votre compte ?');
+    const confirmation = confirm(
+        '⚠️ ATTENTION : Cette action est irréversible !\n\n' +
+        'Voulez-vous vraiment supprimer définitivement votre compte ?'
+    );
     
     if (confirmation) {
         const verification = prompt('Pour confirmer, tapez "SUPPRIMER" en majuscules :');
         
         if (verification === 'SUPPRIMER') {
-            console.log('Compte supprimé définitivement');
+            console.log('Account deleted');
             showNotification('Compte supprimé. Redirection...', 'error');
             setTimeout(() => {
-                window.location.href = 'logout.html';
+                window.location.href = '../pages/login.html';
             }, 2000);
         } else {
             showNotification('Suppression annulée', 'info');
@@ -175,7 +228,7 @@ function deleteAccount() {
     }
 }
 
-// ============= UTILITY FUNCTIONS =============
+// ============= VALIDATION FUNCTIONS =============
 function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
@@ -187,46 +240,71 @@ function validatePassword(password) {
     return hasUpperCase && hasNumber;
 }
 
+// ============= NOTIFICATION SYSTEM =============
 function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    document.querySelectorAll('.toast-notification').forEach(n => n.remove());
+    
     const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
+    notification.className = `toast-notification toast-${type}`;
+    
+    const colors = {
+        success: 'var(--color-success-emphasis)',
+        error: 'var(--color-danger-emphasis)',
+        warning: 'var(--color-attention-emphasis)',
+        info: 'var(--color-accent-emphasis)'
+    };
     
     notification.style.cssText = `
         position: fixed;
-        top: 100px;
-        right: 20px;
-        padding: 16px 24px;
-        background: ${type === 'success' ? '#38a169' : type === 'error' ? '#e53e3e' : type === 'warning' ? '#d69e2e' : '#3182ce'};
+        top: 80px;
+        right: 16px;
+        padding: 12px 16px;
+        background-color: ${colors[type] || colors.info};
         color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 10000;
-        font-weight: 600;
-        animation: slideIn 0.3s ease;
+        border-radius: 6px;
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        font-size: 14px;
+        font-weight: 500;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease;
     `;
     
+    notification.textContent = message;
     document.body.appendChild(notification);
     
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            notification.remove();
-        }, 300);
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Animations CSS pour les notifications
+// Add notification animations
 const style = document.createElement('style');
 style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(400px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(400px); opacity: 0; }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
     }
 `;
 document.head.appendChild(style);
+
 /* FIN DU SCRIPT ACCOUNT GAB */

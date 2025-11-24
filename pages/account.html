@@ -3,119 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Compte</title>
-    <link rel="stylesheet" href="compte.css">
+    <title>Mon Compte - Gestion de Projet</title>
+    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../CSS/account.css">
 </head>
 <body>
-    <div class="theme-toggle">
-        <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">
+            <span class="theme-icon sun-icon">☀️</span>
+            <span class="theme-icon moon-icon">🌙</span>
+        </button>
     </div>
 
     <div class="container">
-        <h1>Mon Compte</h1>
-        
-        <div class="profile-section">
-            <div class="profile-header">
-                <div class="avatar">
-                    <img src="" alt="Photo de profil" id="avatarImg">
-                    <label for="avatarUpload" class="avatar-upload">📷</label>
-                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+        <header class="page-header">
+            <h1>Mon Compte</h1>
+            <p class="subtitle">Gérez vos informations personnelles</p>
+        </header>
+
+        <!-- Profile Card -->
+        <section class="profile-card">
+            <div class="profile-banner"></div>
+            <div class="profile-content">
+                <div class="avatar-container">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%233498db' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' font-size='40' fill='white' text-anchor='middle' dy='.3em'%3EU%3C/text%3E%3C/svg%3E" alt="Avatar" id="avatarDisplay" class="avatar-img">
+                    <label for="avatarInput" class="avatar-edit-btn">
+                        <svg width="20" height="20" fill="white" viewBox="0 0 24 24">
+                            <path d="M23 19v-6h-2v6h-6v2h6a2 2 0 0 0 2-2zM1 5v6h2V5h6V3H3a2 2 0 0 0-2 2zm22-2h-6v2h6v6h2V5a2 2 0 0 0-2-2zM3 21h6v-2H3v-6H1v6a2 2 0 0 0 2 2z"/>
+                        </svg>
+                    </label>
+                    <input type="file" id="avatarInput" accept="image/*" hidden>
                 </div>
-                <div class="profile-info">
-                    <h2 id="userName">Nom d'utilisateur</h2>
-                    <p id="userEmail">email@exemple.com</p>
+                <div class="profile-details">
+                    <h2 id="displayName">Utilisateur</h2>
+                    <p id="displayEmail">user@example.com</p>
+                    <span class="status-badge">Compte actif</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs-nav">
+            <button class="tab-button active" data-tab="info-tab" onclick="switchTab('info-tab')">
+                <span class="tab-icon">👤</span>
+                <span>Informations</span>
+            </button>
+            <button class="tab-button" data-tab="security-tab" onclick="switchTab('security-tab')">
+                <span class="tab-icon">🔒</span>
+                <span>Sécurité</span>
+            </button>
+            <button class="tab-button" data-tab="preferences-tab" onclick="switchTab('preferences-tab')">
+                <span class="tab-icon">⚙️</span>
+                <span>Préférences</span>
+            </button>
+            <button class="tab-button" data-tab="activity-tab" onclick="switchTab('activity-tab')">
+                <span class="tab-icon">📊</span>
+                <span>Activité</span>
+            </button>
+        </nav>
+
+        <!-- Tab Content: Informations -->
+        <div id="info-tab" class="tab-content active">
+            <div class="card">
+                <h3 class="card-title">Informations personnelles</h3>
+                <form class="info-form">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="firstName">Prénom</label>
+                            <input type="text" id="firstName" placeholder="Jean">
+                        </div>
+                        <div class="form-field">
+                            <label for="lastName">Nom</label>
+                            <input type="text" id="lastName" placeholder="Dupont">
+                        </div>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="emailField">Adresse email</label>
+                        <input type="email" id="emailField" placeholder="jean.dupont@email.com">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="phoneField">Téléphone</label>
+                            <input type="tel" id="phoneField" placeholder="+33 6 00 00 00 00">
+                        </div>
+                        <div class="form-field">
+                            <label for="birthdateField">Date de naissance</label>
+                            <input type="date" id="birthdateField">
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="addressField">Adresse</label>
+                        <input type="text" id="addressField" placeholder="12 rue de la Paix">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="cityField">Ville</label>
+                            <input type="text" id="cityField" placeholder="Paris">
+                        </div>
+                        <div class="form-field">
+                            <label for="postalField">Code postal</label>
+                            <input type="text" id="postalField" placeholder="75000">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" onclick="savePersonalInfo()">
+                            💾 Enregistrer les modifications
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            ↺ Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab Content: Sécurité -->
+        <div id="security-tab" class="tab-content">
+            <div class="card">
+                <h3 class="card-title">Modifier le mot de passe</h3>
+                <form class="security-form">
+                    <div class="form-field">
+                        <label for="currentPassword">Mot de passe actuel</label>
+                        <input type="password" id="currentPassword" placeholder="••••••••">
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="newPassword">Nouveau mot de passe</label>
+                        <input type="password" id="newPassword" placeholder="••••••••">
+                        <small class="field-hint">Minimum 8 caractères avec majuscules et chiffres</small>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="confirmPassword">Confirmer le mot de passe</label>
+                        <input type="password" id="confirmPassword" placeholder="••••••••">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" onclick="updatePassword()">
+                            🔐 Changer le mot de passe
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Authentification à deux facteurs (2FA)</h3>
+                <div class="security-option">
+                    <div class="option-info">
+                        <h4>Protection avancée</h4>
+                        <p>Ajoutez une couche de sécurité supplémentaire à votre compte</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="enable2FA">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Sessions actives</h3>
+                <div class="session-list">
+                    <div class="session-item">
+                        <div class="session-icon">💻</div>
+                        <div class="session-details">
+                            <h4>Chrome sur Windows</h4>
+                            <p>Paris, France • Actuelle</p>
+                        </div>
+                        <span class="session-badge active">Active</span>
+                    </div>
+                    <div class="session-item">
+                        <div class="session-icon">📱</div>
+                        <div class="session-details">
+                            <h4>Safari sur iPhone</h4>
+                            <p>Lyon, France • Il y a 2 jours</p>
+                        </div>
+                        <button class="btn-text-danger" onclick="revokeSession(2)">Révoquer</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('infos')">Informations</button>
-            <button class="tab-btn" onclick="showTab('securite')">Sécurité</button>
-            <button class="tab-btn" onclick="showTab('preferences')">Préférences</button>
-        </div>
+        <!-- Tab Content: Préférences -->
+        <div id="preferences-tab" class="tab-content">
+            <div class="card">
+                <h3 class="card-title">Paramètres généraux</h3>
+                
+                <div class="preference-row">
+                    <div class="preference-info">
+                        <h4>Langue</h4>
+                        <p>Choisissez votre langue préférée</p>
+                    </div>
+                    <select id="languageSelect" class="select-input">
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
 
-        <div id="infos" class="tab-content active">
-            <h3>Informations Personnelles</h3>
-            <form class="info-form">
-                <div class="form-group">
-                    <label>Nom complet</label>
-                    <input type="text" id="fullName" placeholder="Votre nom">
+                <div class="preference-row">
+                    <div class="preference-info">
+                        <h4>Fuseau horaire</h4>
+                        <p>Définissez votre fuseau horaire</p>
+                    </div>
+                    <select id="timezoneSelect" class="select-input">
+                        <option value="Europe/Paris">Europe/Paris (CET)</option>
+                        <option value="Europe/London">Europe/London (GMT)</option>
+                        <option value="America/New_York">America/New York (EST)</option>
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="email" placeholder="email@exemple.com">
-                </div>
-                <div class="form-group">
-                    <label>Téléphone</label>
-                    <input type="tel" id="phone" placeholder="+33 6 00 00 00 00">
-                </div>
-                <div class="form-group">
-                    <label>Date de naissance</label>
-                    <input type="date" id="birthdate">
-                </div>
-                <button type="button" class="btn-primary" onclick="saveInfo()">Enregistrer</button>
-            </form>
-        </div>
+            </div>
 
-        <div id="securite" class="tab-content">
-            <h3>Sécurité du Compte</h3>
-            <form class="security-form">
-                <div class="form-group">
-                    <label>Mot de passe actuel</label>
-                    <input type="password" id="currentPass" placeholder="••••••••">
+            <div class="card">
+                <h3 class="card-title">Notifications</h3>
+                
+                <div class="preference-row">
+                    <div class="preference-info">
+                        <h4>Notifications par email</h4>
+                        <p>Recevez des mises à jour par email</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>
-                <div class="form-group">
-                    <label>Nouveau mot de passe</label>
-                    <input type="password" id="newPass" placeholder="••••••••">
-                </div>
-                <div class="form-group">
-                    <label>Confirmer le mot de passe</label>
-                    <input type="password" id="confirmPass" placeholder="••••••••">
-                </div>
-                <button type="button" class="btn-primary" onclick="changePassword()">Changer le mot de passe</button>
-            </form>
 
-            <div class="security-options">
-                <h4>Authentification à deux facteurs</h4>
-                <label class="switch">
-                    <input type="checkbox" id="2fa">
-                    <span class="slider"></span>
-                </label>
+                <div class="preference-row">
+                    <div class="preference-info">
+                        <h4>Notifications push</h4>
+                        <p>Activez les notifications sur votre navigateur</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="pushNotifications">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="preference-row">
+                    <div class="preference-info">
+                        <h4>Notifications SMS</h4>
+                        <p>Recevez des alertes par SMS</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="smsNotifications">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
             </div>
         </div>
 
-        <div id="preferences" class="tab-content">
-            <h3>Préférences</h3>
-            <div class="preference-item">
-                <label>Langue</label>
-                <select id="language">
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                </select>
-            </div>
-            <div class="preference-item">
-                <label>Notifications email</label>
-                <label class="switch">
-                    <input type="checkbox" id="emailNotif" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="preference-item">
-                <label>Notifications push</label>
-                <label class="switch">
-                    <input type="checkbox" id="pushNotif">
-                    <span class="slider"></span>
-                </label>
+        <!-- Tab Content: Activité -->
+        <div id="activity-tab" class="tab-content">
+            <div class="card">
+                <h3 class="card-title">Historique d'activité</h3>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon success">✓</div>
+                        <div class="activity-details">
+                            <h4>Connexion réussie</h4>
+                            <p>Aujourd'hui à 14:23 • Paris, France</p>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon info">ℹ</div>
+                        <div class="activity-details">
+                            <h4>Modification du profil</h4>
+                            <p>Hier à 10:15 • Paris, France</p>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon warning">⚠</div>
+                        <div class="activity-details">
+                            <h4>Tentative de connexion échouée</h4>
+                            <p>Il y a 3 jours à 22:47 • Lieu inconnu</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="danger-zone">
-            <h3>Zone Dangereuse</h3>
-            <button class="btn-danger" onclick="deleteAccount()">Supprimer mon compte</button>
+        <!-- Danger Zone -->
+        <div class="card danger-card">
+            <h3 class="card-title danger-title">⚠️ Zone dangereuse</h3>
+            <p class="danger-description">Les actions ci-dessous sont irréversibles. Procédez avec prudence.</p>
+            <div class="danger-actions">
+                <button class="btn btn-danger" onclick="deactivateAccount()">
+                    Désactiver mon compte
+                </button>
+                <button class="btn btn-danger-outline" onclick="deleteAccount()">
+                    Supprimer définitivement mon compte
+                </button>
+            </div>
         </div>
     </div>
 
-    <script src="compte.js"></script>
+    <script src="../JS/script.js"></script>
 </body>
 </html>

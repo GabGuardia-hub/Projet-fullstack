@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardiaProjets • Contact</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="top-nav">
+            <div class="logo">Guardia<span>Projets</span></div>
+            <div class="header-actions">
+                <a class="btn btn-ghost" href="index.html">Accueil</a>
+                <a class="btn btn-ghost" href="Mes Projet.html">Mes projets</a>
+                <a class="btn btn-ghost" href="Aide.html">Aide</a>
+                <a class="btn btn-primary" href="Contact.html">Contact</a>
+                <a class="btn btn-ghost" href="Login.html">Se connecter</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Nous écrire</p>
+                <h1>Parlons de vos projets et de votre équipe.</h1>
+                <p>Nos experts GuardiaProjets répondent en quelques heures aux questions commerciales ou techniques.</p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="mailto:support@guardiaprojets.com">Écrire au support</a>
+                    <a class="btn btn-ghost" href="tel:+33184234567">+33 1 84 23 45 67</a>
+                </div>
+            </div>
+            <div class="hero-cards">
+                <div class="category-card" style="background: linear-gradient(160deg, #f97316, #ea580c);">
+                    <strong>Disponibilité</strong>
+                    <span>Lun–Ven · 9h à 19h CET</span>
+                </div>
+                <div class="category-card" style="background: linear-gradient(160deg, #ec4899, #db2777);">
+                    <strong>Langues</strong>
+                    <span>Français, Anglais, Espagnol</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="workflow-section">
+            <div class="workflow-selector">
+                <h2>Formulaire rapide</h2>
+                <form class="workflow-grid" style="grid-template-columns: 1fr; gap: 12px;">
+                    <input type="text" placeholder="Nom complet" class="btn btn-ghost" style="text-align:left;">
+                    <input type="email" placeholder="Email professionnel" class="btn btn-ghost" style="text-align:left;">
+                    <select class="btn btn-ghost" style="text-align:left;">
+                        <option>Choisir le sujet…</option>
+                        <option>Démo produit</option>
+                        <option>Assistance technique</option>
+                        <option>Facturation</option>
+                    </select>
+                    <textarea rows="4" placeholder="Message" class="btn btn-ghost" style="text-align:left; resize: vertical;"></textarea>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </form>
+            </div>
+            <div class="workflow-preview" style="order:1;">
+                <div class="preview-pill">Adresse</div>
+                <div style="background:#fff;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px;height:100%;">
+                    <strong>Paris - Quartier Opéra</strong>
+                    <p>45 Rue du Projet<br>75002 Paris, France</p>
+                    <strong>Besoin d'un rendez-vous ?</strong>
+                    <p>Réservez un créneau visio directement depuis votre espace "Mon compte".</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

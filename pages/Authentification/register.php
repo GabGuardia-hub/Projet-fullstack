@@ -129,7 +129,7 @@ if (isset($_POST['envoie'])) {
             <button type="submit" name = "envoie" class="btn-submit">Créer mon compte</button>
 
             <div class="footer-link">
-                Déjà membre ? <a href="login.html">Se connecter</a>
+                Déjà membre ? <a href="login.php">Se connecter</a>
             </div>
         </form>
     </div>

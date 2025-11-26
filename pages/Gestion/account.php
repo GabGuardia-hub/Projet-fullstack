@@ -46,7 +46,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#account.php" class="nav-link active" onclick="showSection('account')">
+                            <a href="#account" class="nav-link active" onclick="showSection('account')">
                                 <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <circle cx="12" cy="12" r="3"/>
                                     <path d="M12 1v6m0 6v6m8.66-13.66l-4.24 4.24m-4.84 4.84l-4.24 4.24M23 12h-6m-6 0H1m17.66 8.66l-4.24-4.24m-4.84-4.84l-4.24-4.24"/>
@@ -178,17 +178,17 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="firstName">Prénom</label>
-                            <input type="text" id="firstName" class="form-input" placeholder="Jean">
+                            <input type="text" id="firstName" class="form-input" placeholder="<?php echo isset($_SESSION['firstName']) ? htmlspecialchars($_SESSION['firstName']) : 'Jean'; ?>">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="lastName">Nom</label>
-                            <input type="text" id="lastName" class="form-input" placeholder="Dupont">
+                            <input type="text" id="lastName" class="form-input" placeholder="<?php echo isset($_SESSION['lastName']) ? htmlspecialchars($_SESSION['lastName']) : 'Dupont'; ?>">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="accountEmail">Adresse email</label>
-                        <input type="email" id="accountEmail" class="form-input" placeholder="jean.dupont@email.com">
+                        <input type="email" id="accountEmail" class="form-input" placeholder="<?php echo isset($_SESSION['email']) ? htmlspecialchars($_SESSION['email']) : 'jean.dupont@email.com'; ?>">
                     </div>
 
                     <div class="form-row">
@@ -209,7 +209,6 @@
                 </div>
 
                 <div class="settings-group danger-zone">
-                    <h2 class="group-title">Zone de danger</h2>
                     <div class="danger-item">
                         <div class="danger-info">
                             <h3>Supprimer ce compte</h3>

@@ -7,22 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <header>
-        <div class="top-nav">
-            <div class="logo">Guardia<span>Projets</span></div>
-            <div class="header-actions">
-                <a class="btn btn-ghost" href="index.html">Accueil</a>
-                <a class="btn btn-ghost" href="Mes Projet.html">Mes projets</a>
-                <a class="btn btn-ghost" href="Aide.html">Aide</a>
-                <a class="btn btn-primary" href="Contact.html">Contact</a>
-                <a class="btn btn-ghost" href="Login.html">Se connecter</a>
-            </div>
-        </div>
-    </header>
-
+    <?php include '../nav/nav.php'; ?>
     <main>
         <section class="hero">
             <div class="hero-copy">

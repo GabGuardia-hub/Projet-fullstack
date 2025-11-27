@@ -203,6 +203,18 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
+        .panels-container a {
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .panels-container a:hover {
+            text-decoration: underline;
+        }
+
+
         .panel {
             display: flex;
             flex-direction: column;

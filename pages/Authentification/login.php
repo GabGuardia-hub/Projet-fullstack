@@ -93,6 +93,7 @@ if(!empty($_POST['email']) AND !empty($_POST['password'])) {
         <div class="panels-container">
             <div class="panel left-panel">
                 <div class="content">
+                    <a href="../../index.php" class="btn retour-btn" role="button" aria-label="Retour à l'accueil">← Accueil</a>
                     <h3>Nouveau ici ?</h3>
                     <p>
                         Découvrez une gestion de projet simplifiée grace à GuardiaProjets. Créez votre compte en seulement quelques clics.

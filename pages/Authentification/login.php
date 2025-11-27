@@ -27,7 +27,7 @@ if(!empty($_POST['email']) AND !empty($_POST['password'])) {
             $_SESSION['firstName'] = $user['firstName'];
             $_SESSION['email'] = $user['email'];
 
-            header("Location: ../../index.html");
+            header("Location: ../../index.php");
         } else {
             $errorMsg = "Adresse Mail ou Mot de passe incorrect.";
         }

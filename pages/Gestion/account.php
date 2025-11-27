@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="../../css/account.css">
 </head>
 <body>
+
+    <?php include '../nav/nav.php'; ?>
     <!-- Theme Toggle Button (Top Right) -->
     <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">
         <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -54,14 +56,7 @@
                                 Compte
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="#appearance" class="nav-link" onclick="showSection('appearance')">
-                                <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-                                </svg>
-                                Apparence
-                            </a>
-                        </li>
+                        
                         <li class="nav-item">
                             <a href="#notifications" class="nav-link" onclick="showSection('notifications')">
                                 <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -219,66 +214,7 @@
                 </div>
             </section>
 
-            <!-- Appearance Section -->
-            <section id="appearance" class="content-section" style="display: none;">
-                <div class="content-header">
-                    <h1>Apparence</h1>
-                    <p class="content-description">Personnalisez l'apparence de l'interface selon vos préférences.</p>
-                </div>
-
-                <div class="settings-group">
-                    <h2 class="group-title">Mode du thème</h2>
-                    <p class="group-description">Choisissez comment vous souhaitez que l'interface apparaisse.</p>
-                    
-                    <div class="theme-options">
-                        <label class="theme-option">
-                            <input type="radio" name="theme" value="light" onchange="setTheme('light')">
-                            <div class="theme-card">
-                                <div class="theme-preview light-preview">
-                                    <div class="preview-header"></div>
-                                    <div class="preview-sidebar"></div>
-                                    <div class="preview-content"></div>
-                                </div>
-                                <div class="theme-info">
-                                    <strong>Clair</strong>
-                                    <p>Interface claire</p>
-                                </div>
-                            </div>
-                        </label>
-
-                        <label class="theme-option">
-                            <input type="radio" name="theme" value="dark" onchange="setTheme('dark')">
-                            <div class="theme-card">
-                                <div class="theme-preview dark-preview">
-                                    <div class="preview-header"></div>
-                                    <div class="preview-sidebar"></div>
-                                    <div class="preview-content"></div>
-                                </div>
-                                <div class="theme-info">
-                                    <strong>Sombre</strong>
-                                    <p>Interface sombre</p>
-                                </div>
-                            </div>
-                        </label>
-
-                        <label class="theme-option">
-                            <input type="radio" name="theme" value="auto" onchange="setTheme('auto')">
-                            <div class="theme-card">
-                                <div class="theme-preview auto-preview">
-                                    <div class="preview-split">
-                                        <div class="preview-half light-half"></div>
-                                        <div class="preview-half dark-half"></div>
-                                    </div>
-                                </div>
-                                <div class="theme-info">
-                                    <strong>Auto</strong>
-                                    <p>Suit le système</p>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            </section>
+            
 
             <!-- Notifications Section -->
             <section id="notifications" class="content-section" style="display: none;">

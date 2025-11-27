@@ -28,7 +28,7 @@
             <div class="hero-copy">
                 <p class="eyebrow">Nouveau • Plateforme unifiée</p>
                 <h1>Couverture totale de vos projets avec GuardiaProjets.</h1>
-                <p>Orchestrez vos équipes, vos tâches et vos opérations dans un espace élégant inspiré des meilleures pratiques monday.com.</p>
+                <p>Orchestrez vos équipes, vos tâches et vos opérations dans un espace élégant inspiré des meilleures pratiques .</p>
                 <div class="hero-actions">
                     <button class="btn btn-primary">Créer un compte</button>
                 </div>

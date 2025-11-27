@@ -28,25 +28,25 @@
             <div class="hero-copy">
                 <p class="eyebrow">Nouveau • Plateforme unifiée</p>
                 <h1>Couverture totale de vos projets avec GuardiaProjets.</h1>
-                <p>Orchestrez vos équipes, vos tâches et vos opérations dans un espace élégant inspiré des meilleures pratiques monday.com.</p>
+                <p>Orchestrez vos équipes, vos tâches et vos opérations dans un espace élégant inspiré des meilleures pratiques</p>
                 <div class="hero-actions">
-                    <button class="btn btn-primary">Créer un compte</button>
+                    <a href="pages/Authentification/register.php"><button class="btn btn-primary">Créer un compte</button></a>
                 </div>
             </div>
             <div class="hero-cards">
-                <button class="category-card" style="background: linear-gradient(160deg, #7c3aed, #4c1d95);">
+                <button class="category-card" style="background: linear-gradient(160deg, #b18defff, #4c1d95);">
                     <strong>Projets & tâches</strong>
                     <span>Suivez chaque jalon en temps réel.</span>
                 </button>
-                <button class="category-card" style="background: linear-gradient(160deg, #0ea5e9, #2563eb);">
+                <button class="category-card" style="background: linear-gradient(160deg, #5ec6f7ff, #2563eb);">
                     <strong>Informatique & assistance</strong>
                     <span>Centralisez incidents et déploiements.</span>
                 </button>
-                <button class="category-card" style="background: linear-gradient(160deg, #f97316, #ea580c);">
+                <button class="category-card" style="background: linear-gradient(160deg, #fea768ff, #ff5900ff);">
                     <strong>Opérations</strong>
                     <span>Industrialisez vos processus critiques.</span>
                 </button>
-                <button class="category-card" style="background: linear-gradient(160deg, #ec4899, #db2777);">
+                <button class="category-card" style="background: linear-gradient(160deg, #ff85c2ff, #ff0073ff);">
                     <strong>Création & design</strong>
                     <span>Coordonnez briefs et validations.</span>
                 </button>
@@ -55,7 +55,7 @@
 
         <section class="workflow-section">
             <div class="workflow-preview">
-                <div class="preview-pill">Vue dynamique</div>
+                <div class="preview-pill">Cliquez sur les cartes à gauche.</div>
                 <img id="workflowImage" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="Aperçu workflow">
             </div>
             <div class="workflow-selector">
@@ -112,21 +112,21 @@
                     </button>
                 </div>
                 <div class="hero-actions" style="margin-top: 32px;">
-                    <button class="btn btn-primary">Commencer →</button>
+                    <a href="pages/Gestion/projets.php"> <button class="btn btn-primary">Commencer →</button></a>
                     <button class="btn btn-ghost">Voir les modèles</button>
                 </div>
             </div>
         </section>
 
         <div class="trust-logos">
-            Adopté par les équipes ambitieuses
+            Adopté par les équipes tel que
             <ul>
-                <li>Uber</li>
-                <li>Welcome to the Jungle</li>
-                <li>Carrefour</li>
-                <li>Renault</li>
-                <li>Engie</li>
-                <li>Leboncoin</li>
+                <li>Hubert</li>
+                <li>Welcome to the Forest</li>
+                <li>Rondpoint</li>
+                <li>Renée</li>
+                <li>Angine</li>
+                <li>Lemauvaiscoin</li>
             </ul>
         </div>
     </main>

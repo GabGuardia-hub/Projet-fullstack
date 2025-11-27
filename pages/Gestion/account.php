@@ -1,4 +1,53 @@
-<?php require('../../backend/account.php'); ?>
+<?php
+require('../../backend/account.php');
+$bdd = new PDO('mysql:host=localhost;dbname=Projets_full_stack;charset=utf8;', 'root', 'root');
+$bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+session_start();
+// on suppose que $_SESSION['id'] contient l'id de l'utilisateur connecté
+$userId = $_SESSION['id'];
+
+// ----- TRAITEMENT DU FORMULAIRE -----
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+
+    $newlastName  = trim($_POST['newlastName'] ?? '');
+    $newfirstName = trim($_POST['newfirstName'] ?? '');
+    $email        = trim($_POST['email'] ?? '');
+    $phone        = trim($_POST['phone'] ?? '');
+
+    // Optionnel : petites validations
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Email invalide.";
+    } else {
+        // Si téléphone vide → NULL
+        $phoneParam = ($phone === '') ? null : $phone;
+
+        $sql = "UPDATE users
+                SET lastName  = :lastName,
+                    firstName = :firstName,
+                    email     = :email,
+                    phone     = :phone
+                WHERE id = :id";
+
+        $stmt = $bdd->prepare($sql);
+        $stmt->execute([
+            ':lastName'  => $newlastName,
+            ':firstName' => $newfirstName,
+            ':email'     => $email,
+            ':phone'     => $pphone,
+        ]);
+
+        // Met à jour la session pour afficher les nouvelles valeurs
+        $_SESSION['lastName']  = $newlastName;
+        $_SESSION['firstName'] = $newfirstName;
+        $_SESSION['email']     = $email;
+        $_SESSION['phone']     = $hone;
+
+        header('Location: account.php?updated=1');
+        exit;
+    }
+}
+?>
 
 
 <!DOCTYPE html>
@@ -169,15 +218,15 @@
 
                 <div class="settings-group">
                     <h2 class="group-title">Informations personnelles</h2>
-                    
+                    <form action="#" method="POST">
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="firstName">Prénom</label>
-                            <input type="text" id="firstName" class="form-input" placeholder="<?php echo isset($_SESSION['firstName']) ? htmlspecialchars($_SESSION['firstName']) : 'Jean'; ?>">
+                            <input type="text" id="firstName" name="newfirstName" class="form-input" placeholder="<?php echo isset($_SESSION['firstName']) ? htmlspecialchars($_SESSION['firstName']) : 'Jean'; ?>">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="lastName">Nom</label>
-                            <input type="text" id="lastName" class="form-input" placeholder="<?php echo isset($_SESSION['lastName']) ? htmlspecialchars($_SESSION['lastName']) : 'Dupont'; ?>">
+                            <input type="text" id="lastName" name="newlastName" class="form-input" placeholder="<?php echo isset($_SESSION['lastName']) ? htmlspecialchars($_SESSION['lastName']) : 'Dupont'; ?>">
                         </div>
                     </div>
 
@@ -186,22 +235,17 @@
                         <input type="email" id="accountEmail" class="form-input" placeholder="<?php echo isset($_SESSION['email']) ? htmlspecialchars($_SESSION['email']) : 'jean.dupont@email.com'; ?>">
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="phone">Téléphone</label>
-                            <input type="tel" id="phone" class="form-input" placeholder="+33 6 00 00 00 00">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="birthdate">Date de naissance</label>
-                            <input type="date" id="birthdate" class="form-input">
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Téléphone</label>
+                        <input type="tel" id="phone" name="newphone" class="form-input" placeholder="+33 6 00 00 00 00">
                     </div>
+                    
 
                     <div class="form-actions">
                         <button class="btn-primary" onclick="saveAccount()">Enregistrer</button>
                         <button class="btn-secondary" onclick="resetAccountForm()">Annuler</button>
                     </div>
-                </div>
+                </div></form>
 
                 <div class="settings-group danger-zone">
                     <div class="danger-item">

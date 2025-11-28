@@ -1,3 +1,4 @@
+<?php require('../../backend/account.php'); ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>

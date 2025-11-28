@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,8 +14,11 @@
                 <a class="btn btn-ghost" href="../Gestion/projets.php">Mes projets</a>
                 <a class="btn btn-ghost" href="../support/Aide.php">Aide</a>
                 <a class="btn btn-ghost" href="../support/Contact.php">Contact</a>
-                <a class="btn btn-ghost" href="../Authentification/login.php">Se connecter</a>
-                <a class="btn btn-gradient" href="../Gestion/account.php">Mon compte</a>
+                <?php if (!isset($_SESSION['connected'])): ?>
+                    <a class="btn btn-gradient" href="../Authentification/login.php">Se connecter</a>
+                <?php else: ?>
+                    <a class="btn btn-gradient" href="../Gestion/account.php">Mon compte</a>
+                <?php endif; ?>
             </div>
         </div>
 </body>

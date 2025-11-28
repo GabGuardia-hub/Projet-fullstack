@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,8 +21,11 @@
                 <a class="btn btn-ghost" href="pages/Gestion/projets.php">Mes projets</a>
                 <a class="btn btn-ghost" href="pages/support/Aide.php">Aide</a>
                 <a class="btn btn-ghost" href="pages/support/Contact.php">Contact</a>
-                <a class="btn btn-ghost" href="pages/Authentification/login.php">Se connecter</a>
-                <a class="btn btn-gradient" href="pages/Gestion/account.php">Mon compte</a>
+                <?php if (!isset($_SESSION['connected']) || $_SESSION['connected'] != true): ?>
+                    <a class="btn btn-gradient" href="pages/Authentification/login.php">Se connecter</a>
+                <?php else: ?>
+                    <a class="btn btn-gradient" href="pages/Gestion/account.php">Mon compte</a>
+                <?php endif; ?>
             </div>
         </div>
     </header>

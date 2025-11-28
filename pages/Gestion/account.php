@@ -1,52 +1,33 @@
 <?php
 require('../../backend/account.php');
+
 $bdd = new PDO('mysql:host=localhost;dbname=Projets_full_stack;charset=utf8;', 'root', 'root');
-$bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    if (isset($_POST['valider'])) {
 
-session_start();
-// on suppose que $_SESSION['id'] contient l'id de l'utilisateur connecté
-$userId = $_SESSION['id'];
+        
 
-// ----- TRAITEMENT DU FORMULAIRE -----
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+        if (!empty($_POST['newlastName']) && !empty($_POST['newfirstName']) && !empty($_POST['newemail']) && !empty($_POST['newphone'])) {
+            $newlastName = htmlspecialchars($_POST['newlastName']);
+            $newfirstName = htmlspecialchars($_POST['newfirstName']);
+            $newemail = htmlspecialchars($_POST['newemail']);
+            $newphone = htmlspecialchars($_POST['newphone']);
 
-    $newlastName  = trim($_POST['newlastName'] ?? '');
-    $newfirstName = trim($_POST['newfirstName'] ?? '');
-    $email        = trim($_POST['email'] ?? '');
-    $phone        = trim($_POST['phone'] ?? '');
+            // Mettre à jour les variables de session
+            $_SESSION['lastName'] = $newlastName;
+            $_SESSION['firstName'] = $newfirstName;
+            $_SESSION['email'] = $newemail;
+            $_SESSION['phone'] = $newphone;
+            $_SESSION['id'] = $_SESSION['id'];
+            
+            $updateUser = $bdd->prepare("UPDATE users SET lastName = ?, firstName = ?, email = ?, phone = ? WHERE id = ?");
+            $updateUser->execute(array($newlastName, $newfirstName, $newemail, $newphone, $_SESSION['id']));
 
-    // Optionnel : petites validations
-    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Email invalide.";
-    } else {
-        // Si téléphone vide → NULL
-        $phoneParam = ($phone === '') ? null : $phone;
+            header("Location: account.php");
 
-        $sql = "UPDATE users
-                SET lastName  = :lastName,
-                    firstName = :firstName,
-                    email     = :email,
-                    phone     = :phone
-                WHERE id = :id";
-
-        $stmt = $bdd->prepare($sql);
-        $stmt->execute([
-            ':lastName'  => $newlastName,
-            ':firstName' => $newfirstName,
-            ':email'     => $email,
-            ':phone'     => $pphone,
-        ]);
-
-        // Met à jour la session pour afficher les nouvelles valeurs
-        $_SESSION['lastName']  = $newlastName;
-        $_SESSION['firstName'] = $newfirstName;
-        $_SESSION['email']     = $email;
-        $_SESSION['phone']     = $hone;
-
-        header('Location: account.php?updated=1');
-        exit;
+        }
+        
+        
     }
-}
 ?>
 
 
@@ -209,11 +190,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
                 </div>
             </section>
 
+            <!-- Message d'erreur -->
+                <?php if (!empty($errorMsg)): ?>
+                    <div class="error-message">
+                        <?= htmlspecialchars($errorMsg) ?>
+                    </div>
+                <?php endif; ?>
+
             <!-- Account Section -->
+             
             <section id="account" class="content-section active">
                 <div class="content-header">
                     <h1>Compte</h1>
-                    <p class="content-description">Gérez vos paramètres de compte et vos informations personnelles.</p>
+                    <p class="content-description">Gérez vos informations personnelles.</p>
                 </div>
 
                 <div class="settings-group">
@@ -222,27 +211,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="firstName">Prénom</label>
-                            <input type="text" id="firstName" name="newfirstName" class="form-input" placeholder="<?php echo isset($_SESSION['firstName']) ? htmlspecialchars($_SESSION['firstName']) : 'Jean'; ?>">
+                            <input type="text" id="firstName" name="newfirstName" class="form-input" value="<?php echo isset($_SESSION['firstName']) ? htmlspecialchars($_SESSION['firstName']) : 'Jean'; ?>">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="lastName">Nom</label>
-                            <input type="text" id="lastName" name="newlastName" class="form-input" placeholder="<?php echo isset($_SESSION['lastName']) ? htmlspecialchars($_SESSION['lastName']) : 'Dupont'; ?>">
+                            <input type="text" id="lastName" name="newlastName" class="form-input" value="<?php echo isset($_SESSION['lastName']) ? htmlspecialchars($_SESSION['lastName']) : 'Dupont'; ?>">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="accountEmail">Adresse email</label>
-                        <input type="email" id="accountEmail" class="form-input" placeholder="<?php echo isset($_SESSION['email']) ? htmlspecialchars($_SESSION['email']) : 'jean.dupont@email.com'; ?>">
+                        <input type="email" id="accountEmail" name="newemail" class="form-input" value="<?php echo isset($_SESSION['email']) ? htmlspecialchars($_SESSION['email']) : 'jean.dupont@email.com'; ?>">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="phone">Téléphone</label>
-                        <input type="tel" id="phone" name="newphone" class="form-input" placeholder="+33 6 00 00 00 00">
+                        <input type="tel" id="phone" name="newphone" class="form-input" value="<?php echo isset($_SESSION['phone']) ? htmlspecialchars($_SESSION['phone']) : '+33 6 00 00 00 00'; ?>">
                     </div>
                     
 
                     <div class="form-actions">
-                        <button class="btn-primary" onclick="saveAccount()">Enregistrer</button>
+                        <button class="btn-primary" name="valider">Enregistrer les modifications</button>
                         <button class="btn-secondary" onclick="resetAccountForm()">Annuler</button>
                     </div>
                 </div></form>

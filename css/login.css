@@ -20,7 +20,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: #f3f4f6;
+            background: #000000;
             background-image: 
                 radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.1) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
@@ -160,6 +160,27 @@
             transform: translateY(-2px);
         }
 
+        /* Boutons "sign-up-btn" et "retour-btn" en blanc */
+        .btn.sign-up-btn,
+        .sign-up-btn,
+        .btn.retour-btn,
+        .retour-btn {
+            background-color: var(--white);
+            color: var(--primary);
+            border: 1px solid var(--gray-200);
+            box-shadow: none;
+            transition: background-color 0.25s, color 0.25s, transform 0.2s;
+        }
+
+        .btn.sign-up-btn:hover,
+        .sign-up-btn:hover,
+        .btn.retour-btn:hover,
+        .retour-btn:hover {
+            background-color: var(--gray-100);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
         .social-text {
             padding: 0.7rem 0;
             font-size: 1rem;
@@ -201,17 +222,6 @@
             left: 0;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-        }
-
-        .panels-container a {
-            color: var(--primary);
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .panels-container a:hover {
-            text-decoration: underline;
         }
 
 

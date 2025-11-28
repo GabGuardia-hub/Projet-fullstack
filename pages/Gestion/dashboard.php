@@ -67,6 +67,7 @@
         .dashboard-main { flex: 1; padding: 48px clamp(24px, 5vw, 72px); }
         .card, .panel { background: var(--pm-card); border-radius: 28px; padding: clamp(24px, 4vw, 36px); box-shadow: 0 25px 45px rgba(15,23,42,0.08); }
         .main-header { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+        .header-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
         .header-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
         .status-pill { align-self: flex-start; padding: 6px 18px; border-radius: 999px; color: #fff; font-weight: 600; background: var(--pm-primary); }
         .status-pill[data-status*="term"] { background: linear-gradient(135deg, var(--pm-success), #059669); }
@@ -88,8 +89,9 @@
         .data-item:last-child { border-bottom: none; padding-bottom: 0; }
         .data-item--empty { justify-content: center; color: var(--pm-muted); font-style: italic; border-bottom: none; }
         .status-badge { padding: 6px 12px; border-radius: 999px; background: rgba(37,99,235,0.12); color: var(--pm-primary); font-weight: 600; }
-        .status-badge[data-status*="termin"] { background: rgba(16,185,129,0.15); color: var(--pm-success); }
+        .status-badge[data-status*="termin"] { background: rgba(15, 197, 136, 0.15); color: var(--pm-success); }
         .status-badge[data-status*="risq"] { background: rgba(245,158,11,0.2); color: var(--pm-warning); }
+        .task-meta { display: flex; align-items: center; gap: 8px; }
 
         .inline-form { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
         .inline-form input, .inline-form button, .chat-form textarea, .chat-form button { border-radius: 14px; border: 1px solid rgba(31,31,36,0.15); padding: 10px 14px; font-family: inherit; }
@@ -205,8 +207,8 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a class="primary-link" id="editProjectLink" href="creationproj.php">Modifier ce projet</a>
-                <a href="projets.php">← Retour aux projets</a>
+                <a class="btn btn-primary" id="editProjectLink" href="creationproj.php">Modifier ce projet</a>
+                <a class="btn btn-ghost" href="projets.php">← Retour aux projets</a>
             </div>
         </section>
 
@@ -363,13 +365,17 @@
 
     renderList(taskList, project.tasks, (task) => {
         const status = (task.status || 'En cours').toLowerCase();
+        const deadline = task?.deadline || task?.dueDate;
+        const deadlineLabel = deadline ? formatDate(deadline) : '—';
         return `
-            <li class="data-item">
+            <li class="data-item data-item--task">
                 <div>
                     <strong>${escapeHtml(task.title || 'Tâche')}</strong>
-                    <div class="muted">${escapeHtml(task.owner || '')}</div>
+                    <div class="muted">Date limite : ${escapeHtml(deadlineLabel)}</div>
                 </div>
-                <span class="status-badge" data-status="${escapeAttr(status)}">${escapeHtml(task.status || 'En cours')}</span>
+                <div class="task-meta">
+                    <span class="status-badge" data-status="${escapeAttr(status)}">${escapeHtml(task.status || 'En cours')}</span>
+                </div>
             </li>
         `;
     }, 'Aucune tâche pour le moment.');

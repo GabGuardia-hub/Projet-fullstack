@@ -52,7 +52,7 @@ if(!empty($_POST['email']) AND !empty($_POST['password'])) {
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/login.css">
 </head>
-<body>
+<body class="login-page">
     <div class="container">
         <div class="forms-container">
             <div class="signin-signup">

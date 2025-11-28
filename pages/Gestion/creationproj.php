@@ -12,10 +12,10 @@
     <?php include '../nav/nav.php'; ?>
 
     <main class="project-builder">
-        <header class="builder-header">
+        <header class="builder-header panel">
             <div>
                 <p class="eyebrow">Assistant projet</p>
-                <h1 id="builderTitle">Nouveau projet</h1>
+                <h1 id="builderTitle">Creation Projet</h1>
                 <p class="projects-subtitle">Définissez les informations clés, l'équipe, les tâches et les jalons de votre projet.</p>
             </div>
             <div class="builder-actions">
@@ -32,16 +32,16 @@
                         <p class="panel-subtitle">Nom, responsable, dates et statut.</p>
                     </div>
                 </div>
-                <div class="panel-grid">
-                    <div>
+                <div class="panel-grid general-info-grid">
+                    <div class="span-4">
                         <label for="projectName">Nom du projet</label>
                         <input type="text" id="projectName" name="projectName" placeholder="Refonte du portail client" required>
                     </div>
-                    <div>
+                    <div class="span-4">
                         <label for="projectOwner">Responsable</label>
                         <input type="text" id="projectOwner" name="projectOwner" placeholder="Equipe Produit" required>
                     </div>
-                    <div>
+                    <div class="span-4">
                         <label for="projectStatus">Statut</label>
                         <select id="projectStatus" name="projectStatus" required>
                             <option value="En préparation">En préparation</option>
@@ -50,15 +50,15 @@
                             <option value="Terminé">Terminé</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="span-6">
                         <label for="projectStart">Début</label>
                         <input type="date" id="projectStart" name="projectStart">
                     </div>
-                    <div>
+                    <div class="span-6">
                         <label for="projectEnd">Fin prévisionnelle</label>
                         <input type="date" id="projectEnd" name="projectEnd">
                     </div>
-                    <div>
+                    <div class="span-12 full-span">
                         <label for="projectDescription">Description</label>
                         <textarea id="projectDescription" name="projectDescription" placeholder="Objectifs, périmètre et attentes."></textarea>
                     </div>
@@ -79,8 +79,8 @@
             <section class="panel">
                 <div class="panel-header">
                     <div>
-                        <h2>Tâches principales</h2>
-                        <p class="panel-subtitle">Découpez le travail et assignez les responsables.</p>
+                        <h2>Tâches</h2>
+                        <p class="panel-subtitle">Listez les actions clés et leurs dates limites.</p>
                     </div>
                     <button type="button" class="icon-button" id="addTaskRow">+ Ajouter</button>
                 </div>
@@ -157,7 +157,7 @@
             }
 
             if (editingProject) {
-                document.getElementById('builderTitle').textContent = `Modifier • ${editingProject.name}`;
+                document.getElementById('builderTitle').textContent = 'Creation Projet';
                 dashboardShortcut.href = `dashboard.php?project=${encodeURIComponent(editingProject.slug || editingProject.id)}`;
                 hydrateForm(editingProject);
             } else {
@@ -238,7 +238,7 @@
                 row.className = 'dynamic-row';
                 row.innerHTML = `
                     <input type="text" class="task-title" placeholder="Tâche">
-                    <input type="text" class="task-owner" placeholder="Responsable">
+                    <input type="date" class="task-deadline" placeholder="Date limite">
                     <select class="task-status-field">
                         <option value="En cours">En cours</option>
                         <option value="À risque">À risque</option>
@@ -248,7 +248,7 @@
                 `;
                 row.querySelector('.remove-row').addEventListener('click', () => row.remove());
                 row.querySelector('.task-title').value = data.title || '';
-                row.querySelector('.task-owner').value = data.owner || '';
+                row.querySelector('.task-deadline').value = data.deadline || data.dueDate || '';
                 row.querySelector('.task-status-field').value = data.status || 'En cours';
                 taskRows.appendChild(row);
             }
@@ -297,10 +297,10 @@
                 return [...taskRows.querySelectorAll('.dynamic-row')]
                     .map((row) => ({
                         title: row.querySelector('.task-title').value.trim(),
-                        owner: row.querySelector('.task-owner').value.trim(),
+                        deadline: row.querySelector('.task-deadline').value,
                         status: row.querySelector('.task-status-field').value
                     }))
-                    .filter((task) => task.title || task.owner);
+                    .filter((task) => task.title || task.deadline);
             }
 
             function collectTimeline() {

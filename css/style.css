@@ -28,7 +28,6 @@ header {
     top: 0;
     background: #ffffff;
     backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(98, 70, 234, 0.06);
     box-shadow: 0 12px 30px rgba(20, 14, 53, 0.05);
     z-index: 10;
 }

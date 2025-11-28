@@ -1,6 +1,6 @@
 <?php
 session_start();
-$bdd = new PDO('mysql:host=localhost;dbname=Projets_full_stack; charset=utf8;', 'root', '');
+$bdd = new PDO('mysql:host=localhost;dbname=Projets_full_stack; charset=utf8;', 'root', 'root');
 
 $errorMsg = "";
 

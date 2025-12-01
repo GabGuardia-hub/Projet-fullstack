@@ -414,3 +414,77 @@
         text-align: left;
     }
 }
+
+
+/* Conteneur : 2 cards par ligne */
+.grid-projets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* Chaque card prend ~50% - gap */
+.card-projet {
+  flex: 0 0 calc(50% - 0.75rem);
+  box-sizing: border-box;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #f3f3f3;
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  min-height: 180px;
+}
+
+.card-projet:hover,
+.card-projet:focus {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+}
+
+/* Dégradé en haut */
+.card-projet-gradient {
+  height: 90px;
+  background-image: linear-gradient(135deg, #4f46e5, #ec4899, #f97316);
+}
+
+/* Contenu texte */
+.card-projet-content {
+  padding: 1.1em 1.2em 1.3em;
+}
+
+.card-projet-titre {
+  margin: 0 0 .4em 0;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.card-projet-desc {
+  margin: 0;
+  font-size: 0.95em;
+  color: #606060;
+}
+
+.card-projet-meta {
+  margin-top: auto;                 /* pousse la barre au bas de la card */
+  padding: 0.6em 1.1em 0.8em;
+  display: flex;
+  gap: 0.8rem;
+  justify-content: space-between;   /* tout sur une ligne */
+  font-size: 0.78rem;
+  color: #464646;
+  border-top: 1px solid rgba(148,163,184,0.3);
+}
+
+
+/* Optionnel : sur mobile, 1 par ligne */
+@media (max-width: 600px) {
+  .card-projet {
+    flex: 0 0 100%;
+  }
+}

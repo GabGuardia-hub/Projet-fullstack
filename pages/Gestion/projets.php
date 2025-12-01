@@ -1,4 +1,15 @@
-<?php require('../../backend/account.php'); ?>
+<?php require('../../backend/account.php'); 
+$bdd = new PDO('mysql:host=localhost;dbname=Projets_full_stack;charset=utf8;', 'root', 'root');
+// Ici, on a créer les fonctions pour afficher les projets de l'utilisateur connecté //
+$sql = "SELECT * FROM projets WHERE created_by = " . $_SESSION['id'];
+$nom = "SELECT lastName, firstName FROM users WHERE id = " . $_SESSION['id'];
+$resultat = $bdd->query($sql);
+$nom_resultat = $bdd->query($nom);
+
+if (!$resultat) {
+    die("Erreur lors de la récupération des projets : " . $bdd->errorInfo()[2]);
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -27,88 +38,39 @@
                 <div>
                     <p class="eyebrow">Vue d'ensemble</p>
                     <h2>Vos tableaux</h2>
+
+                    <!-- Ici pour afficher tous les projets du mecse -->
+
+                    
+
+
                 </div>
             </div>
-            <div id="projectsGrid" class="projects-grid" aria-live="polite"></div>
+
+            <?php 
+            while ($row = $resultat->fetch(PDO::FETCH_ASSOC)) {
+                echo '<a href="/Projets-full-stack/pages/Gestion/dashboard.php?id='.$row['id'].'" class="card-projet">
+                    <div class="card-projet-gradient"></div>
+                    <div class="card-projet-content">
+                        <h3 class="card-projet-titre">'.htmlspecialchars($row['name']).'</h3>
+                        <p class="card-projet-desc">'.htmlspecialchars($row['description']).'</p>
+                    </div>
+
+                    <div class="card-projet-meta">
+                        <span>Début : '.htmlspecialchars($row['created_at']).'</span>
+                        <span>Dernière update : '.htmlspecialchars($row['updated_at']).'</span>
+                        <span>Fin prévue : '.htmlspecialchars($row['fin_prevue']).'</span>
+                    </div>
+                </a>';
+                
+            }
+            
+            
+            
+            ?>
         </section>
     </main>
 
-    <script>
-        (function() {
-            const storageKey = 'guardia.projects';
-            const gradients = [
-                'linear-gradient(160deg, #7c3aed, #4c1d95)',
-                'linear-gradient(160deg, #0ea5e9, #2563eb)',
-                'linear-gradient(160deg, #f97316, #ea580c)',
-                'linear-gradient(160deg, #10b981, #059669)',
-                'linear-gradient(160deg, #ec4899, #db2777)'
-            ];
-
-            const defaultProjects = [];
-
-            const projectsGrid = document.getElementById('projectsGrid');
-
-            let projects = loadProjects();
-
-            function loadProjects() {
-                try {
-                    const stored = window.localStorage.getItem(storageKey);
-                    if (stored) {
-                        const parsed = JSON.parse(stored);
-                        if (Array.isArray(parsed)) {
-                            return parsed;
-                        }
-                    }
-                } catch (error) {
-                    console.warn('Impossible de lire les projets stockés', error);
-                }
-                return defaultProjects;
-            }
-
-            function formatDate(iso) {
-                try {
-                    return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' }).format(new Date(iso));
-                } catch (_) {
-                    return '—';
-                }
-            }
-
-            function createProjectCard(project, index) {
-                const card = document.createElement('a');
-                card.className = 'project-card';
-
-                card.style.background = project.color || gradients[index % gradients.length];
-                card.href = `dashboard.php?project=${encodeURIComponent(project.slug || project.id)}`;
-                card.setAttribute('aria-label', `Ouvrir le tableau du projet ${project.name}`);
-
-                const meta = document.createElement('div');
-                meta.className = 'project-card__meta';
-                meta.innerHTML = `<span>${project.status}</span><span>${formatDate(project.createdAt)}</span>`;
-
-                const title = document.createElement('h3');
-                title.textContent = project.name;
-
-                const owner = document.createElement('p');
-                owner.className = 'project-card__owner';
-                owner.textContent = project.owner;
-
-                card.append(meta, title, owner);
-                return card;
-            }
-
-            function renderProjects() {
-                projectsGrid.innerHTML = '';
-                projects
-                    .slice()
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .forEach((project, index) => {
-                        projectsGrid.appendChild(createProjectCard(project, index));
-                    });
-            }
-
-            renderProjects();
-        })();
-    </script>
-
+    
 </body>
 </html>

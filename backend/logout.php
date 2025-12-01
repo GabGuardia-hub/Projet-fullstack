@@ -2,5 +2,5 @@
 session_start();
 $_SESSION = array();
 session_destroy();
-header("Location: ../pages/Authentification/login.php");
+header("Location: /Projet-fullstack/pages/Authentification/login.php");
 ?>

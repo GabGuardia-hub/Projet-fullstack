@@ -27,3 +27,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  zap-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ZAP Full Scan on Vercel
+        uses: zaproxy/action-full-scan@v0.9.0
+        with:
+          target: 'https://projet-fullstack-ten.vercel.app/'
+          cmd_options: '-a'

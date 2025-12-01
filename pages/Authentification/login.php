@@ -8,7 +8,7 @@ $db   = $_ENV['DB_NAME'];
 $user = $_ENV['DB_USER'];
 $pass = $_ENV['DB_PASS'];
 
-$bdd = new PDO('mysql:host='.$host.';dbname='.$db.'; charset=utf8;', $user, $pass);
+require('../../backend/env.php');
 
 $errorMsg = "";
 

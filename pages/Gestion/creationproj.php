@@ -1,5 +1,5 @@
 <?php require('../../backend/account.php'); 
-$bdd = new PDO('mysql:host='.$host.';dbname='.$db.'; charset=utf8;', $user, $pass);
+require('../../backend/env.php');
 $errorMsg = "";
 if (isset($_POST['envoie'])) {
 

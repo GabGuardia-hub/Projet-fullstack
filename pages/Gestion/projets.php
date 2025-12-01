@@ -1,5 +1,6 @@
-<?php require('../../backend/account.php'); 
-$bdd = new PDO('mysql:host='.$host.';dbname='.$db.'; charset=utf8;', $user, $pass);
+<?php require('../../backend/account.php');
+require('../../backend/env.php'); 
+
 // Ici, on a créer les fonctions pour afficher les projets de l'utilisateur connecté //
 $sql = "SELECT * FROM projets WHERE created_by = " . $_SESSION['id'];
 $nom = "SELECT lastName, firstName FROM users WHERE id = " . $_SESSION['id'];

@@ -1,5 +1,5 @@
 <?php require('../../backend/account.php'); 
-$bdd = new PDO('mysql:host=localhost;dbname=Projets_full_stack;charset=utf8;', 'root', 'root');
+$bdd = new PDO('mysql:host='.$host.';dbname='.$db.'; charset=utf8;', $user, $pass);
 // Ici, on a créer les fonctions pour afficher les projets de l'utilisateur connecté //
 $sql = "SELECT * FROM projets WHERE created_by = " . $_SESSION['id'];
 $nom = "SELECT lastName, firstName FROM users WHERE id = " . $_SESSION['id'];
@@ -49,7 +49,7 @@ if (!$resultat) {
 
             <?php 
             while ($row = $resultat->fetch(PDO::FETCH_ASSOC)) {
-                echo '<a href="/Projets-full-stack/pages/Gestion/dashboard.php?id='.$row['id'].'" class="card-projet">
+                echo '<a href="/Projets-full-stack/pages/Gestion/dashboard.php?id='.$row['id'].'"class="card-projet">
                     <div class="card-projet-gradient"></div>
                     <div class="card-projet-content">
                         <h3 class="card-projet-titre">'.htmlspecialchars($row['name']).'</h3>

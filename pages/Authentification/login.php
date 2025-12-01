@@ -1,6 +1,14 @@
 <?php
+
 session_start();
-$bdd = new PDO('mysql:host=localhost;dbname=Projets_full_stack; charset=utf8;', 'root', 'root');
+require __DIR__ . '/../../backend/env.php';
+
+$host = $_ENV['DB_HOST'];
+$db   = $_ENV['DB_NAME'];
+$user = $_ENV['DB_USER'];
+$pass = $_ENV['DB_PASS'];
+
+$bdd = new PDO('mysql:host='.$host.';dbname='.$db.'; charset=utf8;', $user, $pass);
 
 $errorMsg = "";
 

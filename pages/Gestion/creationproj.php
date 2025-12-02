@@ -3,7 +3,7 @@ require('../../backend/env.php');
 $errorMsg = "";
 if (isset($_POST['envoie'])) {
 
-    if(!empty($_POST['projectName']) AND !empty($_POST['projectDescription']) AND !empty($_POST['projectStatus']) AND !empty($_POST['projectStart']) AND !empty($_POST['projectEnd'])) {
+    if(!empty($_POST['projectName']) AND !empty($_POST['projectStatus']) AND !empty($_POST['projectStart']) AND !empty($_POST['projectEnd'])) {
         // Ici on récupere les données de l'insciption //
         $name = htmlspecialchars($_POST['projectName']);
         $description = htmlspecialchars($_POST['projectDescription']);
@@ -18,14 +18,58 @@ if (isset($_POST['envoie'])) {
         //On insere les données dans la bdd //
         $insertProject = $bdd->prepare("INSERT INTO projets (name, description, status, created_by, created_at, updated_at, fin_prevue) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $insertProject->execute(array($name, $description, $status, $created_by, $created_at, $updated_at, $fin_prevue));
+        if (!$insertProject) {
+            var_dump($bdd->errorInfo());
+            exit;
+        }
+        $projetId = (int)$bdd->lastInsertId();
+
+        
+        $roleName       = 'Owner';
+        $defaultPermId  = 3; 
+
+        // Chercher un rôle "Owner" avec cette permission
+        $sql = "SELECT id FROM role WHERE name = :name AND perimission_id = :perm_id";
+        $stmt = $bdd->prepare($sql);
+        $stmt->execute([
+            ':name'    => $roleName,
+            ':perm_id' => $defaultPermId
+        ]);
+        $role = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($role) {
+            $roleId = (int)$role['id'];
+        } else {
+            // Créer le rôle s'il n'existe pas
+            $sql = "INSERT INTO role (name, description, perimission_id)
+                    VALUES (:name, 'Créateur du projet', :perm_id)";
+            $stmt = $bdd->prepare($sql);
+            $stmt->execute([
+                ':name'    => $roleName,
+                ':perm_id' => $defaultPermId
+            ]);
+            $roleId = (int)$bdd->lastInsertId();
+        }
+
+        // 3) Insérer le créateur dans membre_projets
+        $sql = "INSERT INTO membre_projets (projets_id, user_id, role_id, joined_at)
+                VALUES (:projets_id, :user_id, :role_id, CURDATE())";
+        $stmt = $bdd->prepare($sql);
+        $stmt->execute([
+            ':projets_id' => $projetId,
+            ':user_id'    => $created_by,
+            ':role_id'    => $roleId
+        ]);
 
         header("Location: projets.php");
-    }else {
-            $errorMsg = "Tous les champs doivent être complétés !";
-            header("Location: creationproj.php");
-        }
+        exit;
+
+    } else {
+        $errorMsg = "Tous les champs doivent être complétés !";
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -46,16 +90,9 @@ if (isset($_POST['envoie'])) {
                 <h1 id="builderTitle">Creation Projet</h1>
                 <p class="projects-subtitle">Définissez les informations clés, l'équipe, les tâches et les jalons de votre projet.</p>
             </div>
-            <!-- Message d'erreur -->
-        <?php if (!empty($errorMsg)): ?>
-            <div class="error-message">
-                <?= htmlspecialchars($errorMsg) ?>
-            </div>
-        <?php endif; ?>
 
             <div class="builder-actions">
                 <a class="btn btn-light" href="projets.php">← Retour à la liste</a>
-                <a class="btn btn-ghost" id="dashboardShortcut" href="dashboard.php">Voir le dashboard</a>
             </div>
         </header>
 
@@ -63,7 +100,14 @@ if (isset($_POST['envoie'])) {
             <section class="panel">
                 <div class="panel-header">
                     <div>
+                        <!--Message erreur-->
+        <?php if (!empty($errorMsg)): ?>
+            <div class="error-message">
+                <?= htmlspecialchars($errorMsg) ?>
+            </div>
+        <?php endif; ?>
                         <h2>Informations générales</h2>
+
                         <p class="panel-subtitle">Nom, responsable, dates et statut.</p>
                     </div>
                 </div>
@@ -98,45 +142,12 @@ if (isset($_POST['envoie'])) {
             <section class="panel">
                 <div class="panel-header">
                     <div>
-                        <h2>Équipe projet</h2>
-                        <p class="panel-subtitle">Invitez les personnes clés et leurs rôles.</p>
-                    </div>
-                    <button type="button" class="icon-button" id="addTeamRow">+ Ajouter</button>
-                </div>
-                <div class="dynamic-section" id="teamRows"></div>
-            </section>
-
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
                         <h2>Tâches</h2>
                         <p class="panel-subtitle">Listez les actions clés et leurs dates limites.</p>
                     </div>
                     <button type="button" class="icon-button" id="addTaskRow">+ Ajouter</button>
                 </div>
                 <div class="dynamic-section" id="taskRows"></div>
-            </section>
-
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Chronologie & jalons</h2>
-                        <p class="panel-subtitle">Suivez les étapes clés du projet.</p>
-                    </div>
-                    <button type="button" class="icon-button" id="addTimelineRow">+ Ajouter</button>
-                </div>
-                <div class="dynamic-section" id="timelineRows"></div>
-            </section>
-
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Drive & ressources</h2>
-                        <p class="panel-subtitle">Centralisez les documents partagés.</p>
-                    </div>
-                    <button type="button" class="icon-button" id="addDriveRow">+ Ajouter</button>
-                </div>
-                <div class="dynamic-section" id="driveRows"></div>
             </section>
 
             <section class="panel">
@@ -150,7 +161,7 @@ if (isset($_POST['envoie'])) {
             </section>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary" name="envoie">Enregistrer et ouvrir le dashboard</button>
+                <input type="submit" name = "envoie" value="Enregistrer" class="btn btn-primary" />
                 <a class="btn btn-ghost" href="projets.php">Annuler</a>
             </div>
 

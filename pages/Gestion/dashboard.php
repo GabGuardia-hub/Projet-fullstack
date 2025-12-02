@@ -1,4 +1,248 @@
-<?php require('../../backend/account.php'); ?>
+<?php require('../../backend/account.php'); 
+require('../../backend/env.php');
+// Vérifier que l'id est présent et numérique
+if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
+    die('Projet invalide.');
+}
+$projectId = (int)$_GET['id'];
+
+$sprojetsql = "
+    SELECT p.*
+    FROM projets p
+    JOIN membre_projets mp ON mp.projets_id = p.id
+    WHERE p.id = :projet_id
+      AND mp.user_id = :user_id
+";
+$projets = $bdd->prepare($sprojetsql);
+$projets->execute([
+    ':projet_id' => $projectId,
+    ':user_id'   => $_SESSION['id']
+]);
+$projet = $projets->fetch(PDO::FETCH_ASSOC);
+
+$taskSql = "SELECT 
+              t.id,
+              t.title,
+              t.description,
+              t.status,
+              t.date_limite,
+              u.id   AS assignee_id,
+              u.firstName,
+              u.lastName
+            FROM task t
+            LEFT JOIN assign_to a ON a.id_task = t.id
+            LEFT JOIN users u      ON u.id = a.id_member
+            WHERE t.projets_id = :projet_id
+            ORDER BY t.date_limite ASC, t.id DESC";
+$taskStmt = $bdd->prepare($taskSql);
+$taskStmt->execute([':projet_id' => $projectId]);
+$tasks = $taskStmt->fetchAll(PDO::FETCH_ASSOC);
+
+if (!$projet) {
+    die('Projet introuvable ou non autorisé.');
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+$userSql = "SELECT lastName, firstName FROM users WHERE id = :user_id";
+$users = $bdd->prepare($userSql);
+$users->execute([':user_id' => $projet['created_by']]);
+$owner = $users->fetch(PDO::FETCH_ASSOC);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_member'])) {
+
+    $email        = trim($_POST['member_email'] ?? '');
+    $roleName     = trim($_POST['role_name'] ?? '');
+    $permissionId = (int)($_POST['permission_id'] ?? 0);
+
+    if ($email !== '' && $roleName !== '' && $permissionId > 0) {
+
+        // 1) Trouver l'utilisateur par email
+        $sql = "SELECT id FROM users WHERE email = :email";
+        $stmt = $bdd->prepare($sql);
+        $stmt->execute([':email' => $email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            $userId = (int)$user['id'];
+
+            // On créer (ou récupère) le rôle avec la permission donnée
+            $Rolesql = "SELECT id FROM role WHERE name = :name AND perimission_id = :perm_id";
+            $Rolestmt = $bdd->prepare($Rolesql);
+            $Rolestmt->execute([
+                ':name'    => $roleName,
+                ':perm_id' => $permissionId
+            ]);
+            $role = $Rolestmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($role) {
+                $roleId = (int)$role['id'];
+            } else {
+                $RoleAddsql = "INSERT INTO role (name, description, perimission_id)
+                        VALUES (:name, '', :perm_id)";
+                $RoleAddstmt = $bdd->prepare($RoleAddsql);
+                $RoleAddstmt->execute([
+                    ':name'    => $roleName,
+                    ':perm_id' => $permissionId
+                ]);
+                $roleId = (int)$bdd->lastInsertId();
+            }
+
+            // 3) Insérer dans membre_projets
+            $membreProjetsql = "INSERT INTO membre_projets (projets_id, user_id, role_id, joined_at)
+                    VALUES (:projets_id, :user_id, :role_id, CURDATE())";
+            $MembreProjetsstmt = $bdd->prepare($membreProjetsql);
+            $MembreProjetsstmt->execute([
+                ':projets_id' => $projectId,
+                ':user_id'    => $userId,
+                ':role_id'    => $roleId
+            ]);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    // On redirige pour éviter le repost du formulaire
+    header('Location: dashboard.php?id=' . $projectId);
+    exit;
+}
+
+// === CHARGER LES MEMBRES EXISTANTS ===
+$Equipesql = "SELECT u.id, u.firstName, u.lastName, u.email,
+                     r.name AS role_name, p.name AS perm_name
+        FROM membre_projets mp
+        JOIN users u      ON u.id = mp.user_id
+        JOIN role r       ON r.id = mp.role_id
+        JOIN permissions p ON p.id = r.perimission_id
+        WHERE mp.projets_id = :projet_id
+        ORDER BY r.name, u.lastName";
+$equipe = $bdd->prepare($Equipesql);
+$equipe->execute([':projet_id' => $projectId]);
+$membres = $equipe->fetchAll(PDO::FETCH_ASSOC);
+
+// === CHARGER LES PERMISSIONS POUR LE SELECT ===
+$Permissionsql = "SELECT id, name, description FROM permissions ORDER BY id";
+$permStmt = $bdd->query($Permissionsql);
+$permissions = $permStmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+if (!$projet) {
+    die('Projet introuvable ou non autorisé.');
+}
+
+// Récupérer la permission de l'utilisateur sur ce projet
+$permSql = "SELECT p.id AS perm_id, p.name AS perm_name
+            FROM membre_projets mp
+            JOIN role r        ON r.id = mp.role_id
+            JOIN permissions p ON p.id = r.perimission_id
+            WHERE mp.projets_id = :projet_id
+              AND mp.user_id   = :user_id
+            LIMIT 1";
+$permStmt = $bdd->prepare($permSql);
+$permStmt->execute([
+    ':projet_id' => $projectId,
+    ':user_id'   => $_SESSION['id']
+]);
+$currentPerm = $permStmt->fetch(PDO::FETCH_ASSOC);
+
+// Seuls les users avec permission id 1 ou 2 peuvent gérer les tâches
+$canManageTasks = $currentPerm && in_array((int)$currentPerm['perm_id'], [3, 2], true);
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_task'])) {
+
+    if (!$canManageTasks) {
+        die('Vous n’êtes pas autorisé à créer des tâches sur ce projet.');
+    }
+
+    $title       = trim($_POST['task_title'] ?? '');
+    $description = trim($_POST['task_description'] ?? '');
+    $deadline    = trim($_POST['task_deadline'] ?? '');
+    $assigneeId  = (int)($_POST['task_assignee'] ?? 0);
+
+    if ($title === '' || $description === '' || $deadline === '' || $assigneeId <= 0) {
+        die('Tous les champs de la tâche doivent être remplis.');
+    }
+
+    // 1) Créer la tâche
+    $sql = "INSERT INTO task (projets_id, title, description, status, created_by, date_limite)
+            VALUES (:projets_id, :title, :description, :status, :created_by, :date_limite)";
+    $stmt = $bdd->prepare($sql);
+    $ok = $stmt->execute([
+        ':projets_id'  => $projectId,
+        ':title'       => $title,
+        ':description' => $description,
+        ':status'      => 'En cours',
+        ':created_by'  => $_SESSION['id'],
+        ':date_limite' => $deadline
+    ]);
+
+    if (!$ok) {
+        var_dump($stmt->errorInfo());
+        exit;
+    }
+
+    $taskId = (int)$bdd->lastInsertId();
+
+    // 2) Assigner la tâche dans assign_to
+    $assignSql = "INSERT INTO assign_to (id_task, id_member)
+                  VALUES (:task_id, :member_id)";
+    $assignStmt = $bdd->prepare($assignSql);
+    $ok2 = $assignStmt->execute([
+        ':task_id'   => $taskId,
+        ':member_id' => $assigneeId
+    ]);
+
+    if (!$ok2) {
+        var_dump($assignStmt->errorInfo());
+        exit;
+    }
+
+    header('Location: dashboard.php?id=' . $projectId . '#tasks');
+    exit;
+}
+
+// Mise à jour du statut d'une tâche
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])) {
+
+    $taskId   = (int)($_POST['task_id'] ?? 0);
+    $newStatus = trim($_POST['task_status'] ?? '');
+
+    $allowed = ['En cours', 'Terminé', 'En retard'];
+    if ($taskId <= 0 || !in_array($newStatus, $allowed, true)) {
+        die('Données de statut invalides.');
+    }
+
+    // Sécurité : ne permettre la modif que si l'utilisateur est assigné à la tâche
+    $checkSql = "SELECT a.id_member
+                 FROM task t
+                 JOIN assign_to a ON a.id_task = t.id
+                 WHERE t.id = :task_id AND t.projets_id = :projet_id";
+    $checkStmt = $bdd->prepare($checkSql);
+    $checkStmt->execute([
+        ':task_id'    => $taskId,
+        ':projet_id'  => $projectId
+    ]);
+    $assign = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$assign || (int)$assign['id_member'] !== (int)$_SESSION['id']) {
+        die('Vous ne pouvez pas modifier cette tâche.');
+    }
+
+    $sql = "UPDATE task SET status = :status WHERE id = :id";
+    $stmt = $bdd->prepare($sql);
+    $stmt->execute([
+        ':status' => $newStatus,
+        ':id'     => $taskId
+    ]);
+
+    header('Location: dashboard.php?id=' . $projectId . '#tasks');
+    exit;
+}
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -20,7 +264,7 @@
                 <span class="logo-icon">GP</span>
                 <div>
                     <span>GuardiaProjets</span>
-                    <div class="sidebar-subtitle">ProManage edition</div>
+                    <small>Dashboard</small>
                 </div>
             </div>
         </div>
@@ -77,26 +321,39 @@
         </div>
     </aside>
 
+
+
+    <!-- Lukas modifie ici -->
+
     <main class="dashboard-main">
-        <section class="main-header card" id="dashboardContent" hidden>
+
+        <section class="main-header card" id="dashboardContent">
             <div>
-                <p class="eyebrow">Dashboard projet</p>
+                <p class="eyebrow">Dashboard du projet : <?php echo htmlspecialchars($projet['name']); ?></p>
                 <h1 id="projectTitle"></h1>
                 <p class="projects-subtitle" id="projectDescription"></p>
             </div>
-            <span class="status-pill" id="projectStatusPill" data-status="">Statut</span>
+            <span class="status-pill" id="projectStatusPill" data-status="<?php echo $projet['status']; ?>">
+                <?php echo htmlspecialchars($projet['status']); ?>
+            </span>
             <div class="header-meta">
                 <div>
                     <strong>Responsable</strong>
-                    <p id="projectOwner">—</p>
+                    <p id="projectOwner">
+                        <?php echo htmlspecialchars($owner['lastName'].' '.$owner['firstName']); ?>
+                    </p>
                 </div>
                 <div>
                     <strong>Début</strong>
-                    <p id="projectStart">—</p>
+                    <p id="projectStart">
+                        <?php echo htmlspecialchars($projet['created_at']); ?>
+                    </p>
                 </div>
                 <div>
                     <strong>Fin prévue</strong>
-                    <p id="projectEnd">—</p>
+                    <p id="projectEnd">
+                        <?php echo htmlspecialchars($projet['fin_prevue']); ?>
+                    </p>
                 </div>
             </div>
             <div class="header-actions">
@@ -104,33 +361,150 @@
                 <a class="btn btn-ghost" href="projets.php">← Retour aux projets</a>
             </div>
         </section>
-
-        <section class="panel-stack" id="dashboardPanels" hidden>
-            <article class="panel" data-panel="overview" hidden>
+            <!-- OVERVIEW -->
+            <article class="panel" data-panel="overview" >
                 <div class="panel-header">
-                    <h2>Vue d'ensemble</h2>
-                    <p class="panel-subtitle">Synthèse des informations clés</p>
+                    <h2>Description du projet</h2>
+                    <p class="panel-subtitle">Résumé du projet</p>
                 </div>
                 <div class="overview-grid" id="overviewStats"></div>
-                <div class="notes-box" id="overviewNotes">Une description concise de votre projet apparaîtra ici.</div>
+                <div class="notes-box" id="overviewNotes">
+                    <?php echo htmlspecialchars($projet['description']); ?>
+                </div>
             </article>
 
+            <!-- TEAM -->
             <article class="panel" data-panel="team" hidden>
                 <div class="panel-header">
                     <h2>Équipe projet</h2>
                     <p class="panel-subtitle">Liste des membres et rôles</p>
                 </div>
-                <ul class="data-list" id="teamList"></ul>
+
+                <ul class="data-list">
+                    <?php if (!$membres): ?>
+                        <li class="data-item--empty">
+                            Aucun membre pour ce projet pour l’instant.
+                        </li>
+                    <?php else: ?>
+                        <?php foreach ($membres as $membre): ?>
+                            <li class="data-item">
+                                <div>
+                                    <strong>
+                                        <?= htmlspecialchars($membre['firstName'].' '.$membre['lastName']) ?>
+                                    </strong>
+                                    <div class="muted">
+                                        <?= htmlspecialchars($membre['email']) ?>
+                                    </div>
+                                </div>
+                                <span class="status-badge">
+                                    <?= htmlspecialchars($membre['role_name']) ?>
+                                    (<?= htmlspecialchars($membre['perm_name']) ?>)
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </ul>
+
+                <form class="inline-form" method="POST" action="" style="margin-top: 20px;">
+                    <input type="hidden" name="add_member" value="1">
+                    <input type="hidden" name="projet_id" value="<?= (int)$projectId ?>">
+
+                    <input type="email" name="member_email" placeholder="Email du membre" required>
+                    <input type="text" name="role_name" placeholder="Nom du rôle (ex: Responsable)" required>
+
+                    <select name="permission_id" required>
+                        <option value="" disabled selected>Permission…</option>
+                        <?php foreach ($permissions as $perm): ?>
+                            <option value="<?= (int)$perm['id'] ?>">
+                                <?= htmlspecialchars($perm['name']) ?> (<?= htmlspecialchars($perm['description']) ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <button type="submit">Ajouter un membre</button>
+                </form>
             </article>
 
+            <!-- TASKS -->
             <article class="panel" data-panel="tasks" hidden>
                 <div class="panel-header">
                     <h2>Tâches</h2>
                     <p class="panel-subtitle">Avancement opérationnel</p>
                 </div>
-                <ul class="data-list" id="taskList"></ul>
+
+                <ul class="data-list" id="taskList">
+                    <?php
+                    $userId = (int)$_SESSION['id'];
+                    $hasTasksForUser = false;
+
+                    foreach ($tasks as $task) {
+                        if ((int)$task['assignee_id'] !== $userId) {
+                            continue;
+                        }
+                        $hasTasksForUser = true;
+                        ?>
+                        <li class="data-item">
+                            <div>
+                                <strong><?= htmlspecialchars($task['title']) ?></strong>
+                                <p class="muted">
+                                    <?= htmlspecialchars($task['description']) ?>
+                                </p>
+                            </div>
+
+                            <div class="task-meta">
+                                <span>Échéance : <?= htmlspecialchars($task['date_limite']) ?></span>
+
+                                <form method="POST" style="margin:0;">
+                                    <input type="hidden" name="update_task_status" value="1">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+
+                                    <select name="task_status" onchange="this.form.submit()">
+                                        <option value="En cours"   <?= $task['status']==='En cours'   ? 'selected' : '' ?>>En cours</option>
+                                        <option value="Terminé"    <?= $task['status']==='Terminé'    ? 'selected' : '' ?>>Fini</option>
+                                        <option value="En retard"  <?= $task['status']==='En retard'  ? 'selected' : '' ?>>En retard</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </li>
+                        <?php
+                    }
+
+                    if (!$hasTasksForUser): ?>
+                        <li class="data-item--empty">
+                            Vous n’avez aucune tâche attribuée pour ce projet.
+                        </li>
+                    <?php endif; ?>
+                </ul>
+
+
+
+                <?php if ($canManageTasks): ?>
+                    <form class="inline-form" method="POST" style="margin-top: 18px;">
+                        <input type="hidden" name="add_task" value="1">
+
+                        <input type="text" name="task_title" placeholder="Titre de la tâche" required>
+                        <input type="text" name="task_description" placeholder="Description rapide" required>
+                        <input type="date" name="task_deadline" required>
+                        <select name="task_assignee" required>
+                        <option value="" disabled selected>Assigner à…</option>
+                        <?php foreach ($membres as $membre): ?>
+                            <option value="<?= (int)$membre['id'] ?>">
+                                <?= htmlspecialchars($membre['firstName'].' '.$membre['lastName']) ?>
+                                (<?= htmlspecialchars($membre['role_name']) ?>)
+                            </option>
+                        <?php endforeach; ?>
+            </select>
+
+                        <button type="submit">Ajouter une tâche</button>
+                    </form>
+                <?php else: ?>
+                    <p class="muted" style="margin-top:12px;">
+                        Seuls les membres avec la permission 1 ou 2 peuvent créer des tâches.
+                    </p>
+                <?php endif; ?>
             </article>
 
+            <!-- TIMELINE -->
             <article class="panel" data-panel="timeline" hidden>
                 <div class="panel-header">
                     <h2>Chronologie</h2>
@@ -139,6 +513,7 @@
                 <ul class="data-list" id="timelineList"></ul>
             </article>
 
+            <!-- DRIVE -->
             <article class="panel" data-panel="drive" hidden>
                 <div class="panel-header">
                     <h2>Drive & ressources</h2>
@@ -154,6 +529,7 @@
                 <small class="muted">Les éléments ajoutés sont sauvegardés localement pour ce projet.</small>
             </article>
 
+            <!-- NOTES -->
             <article class="panel" data-panel="notes" hidden>
                 <div class="panel-header">
                     <h2>Notes & chat</h2>
@@ -170,330 +546,38 @@
             </article>
         </section>
 
-        <section class="card empty-state" id="dashboardEmpty">
-            <h2>Bienvenue sur votre ProManage</h2>
-            <p>Sélectionnez un projet depuis la liste ou créez-en un nouveau pour commencer.</p>
-            <div class="empty-actions">
-                <a class="primary-link" href="creationproj.php">Créer un projet</a>
-                <a href="projets.php">Voir mes projets</a>
-            </div>
-        </section>
     </main>
 </div>
 
-<script>
-(function () {
-    const storageKey = 'guardia.projects';
-    const params = new URLSearchParams(window.location.search);
-    const projectSlug = params.get('project');
 
-    const header = document.getElementById('dashboardContent');
-    const panelsWrapper = document.getElementById('dashboardPanels');
-    const emptyState = document.getElementById('dashboardEmpty');
-    const titleEl = document.getElementById('projectTitle');
-    const descriptionEl = document.getElementById('projectDescription');
-    const statusPill = document.getElementById('projectStatusPill');
-    const ownerEl = document.getElementById('projectOwner');
-    const startEl = document.getElementById('projectStart');
-    const endEl = document.getElementById('projectEnd');
-    const editLink = document.getElementById('editProjectLink');
-    const overviewStats = document.getElementById('overviewStats');
-    const overviewNotes = document.getElementById('overviewNotes');
-    const teamList = document.getElementById('teamList');
-    const taskList = document.getElementById('taskList');
-    const timelineList = document.getElementById('timelineList');
-    const driveList = document.getElementById('driveList');
-    const chatThread = document.getElementById('chatThread');
+<script>
+(function(){
     const navButtons = document.querySelectorAll('[data-panel-target]');
     const panelSections = document.querySelectorAll('[data-panel]');
-    const driveForm = document.getElementById('driveForm');
-    const chatForm = document.getElementById('chatForm');
-    const driveTitleInput = document.getElementById('driveTitle');
-    const driveUrlInput = document.getElementById('driveUrl');
-    const driveTypeInput = document.getElementById('driveType');
-    const chatInput = document.getElementById('chatInput');
 
-    toggleNavigation(false);
+    function showPanel(target) {
+        panelSections.forEach(section => {
+            const active = section.dataset.panel === target;
+            section.hidden = !active;
+            section.classList.toggle('active', active);
+        });
+        navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.panelTarget === target));
+    }
 
-    navButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            if (button.disabled) return;
-            showPanel(button.dataset.panelTarget);
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.disabled) return;
+            showPanel(btn.dataset.panelTarget);
+            // mettre à jour le hash pour le lien direct
+            try { history.replaceState(null, '', '#' + btn.dataset.panelTarget); } catch (e) { location.hash = btn.dataset.panelTarget; }
         });
     });
 
-    const project = findProject();
-    if (!project) {
-        emptyState.hidden = false;
-        return;
-    }
-
-    emptyState.hidden = true;
-    header.hidden = false;
-    panelsWrapper.hidden = false;
-    toggleNavigation(true);
-
-    titleEl.textContent = project.name;
-    const description = project.description || 'Aucune description fournie.';
-    descriptionEl.textContent = description;
-    overviewNotes.textContent = description;
-    statusPill.textContent = project.status || 'En cours';
-    statusPill.dataset.status = (project.status || 'En cours').toLowerCase().replace(/\s+/g, '-');
-    ownerEl.textContent = project.owner || '—';
-    startEl.textContent = formatDate(project.startDate);
-    endEl.textContent = formatDate(project.endDate);
-    editLink.href = `creationproj.php?project=${encodeURIComponent(project.slug || project.id || '')}`;
-
-    updateOverviewStats(project);
-
-    renderList(teamList, project.team, (member) => `
-        <li class="data-item">
-            <div>
-                <strong>${escapeHtml(member.name || 'Membre')}</strong>
-                <div class="muted">${escapeHtml(member.role || 'Rôle non défini')}</div>
-            </div>
-            <a href="mailto:${escapeAttr(member.email || '')}">${escapeHtml(member.email || '')}</a>
-        </li>
-    `, 'Aucun membre renseigné.');
-
-    renderList(taskList, project.tasks, (task) => {
-        const status = (task.status || 'En cours').toLowerCase();
-        const deadline = task?.deadline || task?.dueDate;
-        const deadlineLabel = deadline ? formatDate(deadline) : '—';
-        return `
-            <li class="data-item data-item--task">
-                <div>
-                    <strong>${escapeHtml(task.title || 'Tâche')}</strong>
-                    <div class="muted">Date limite : ${escapeHtml(deadlineLabel)}</div>
-                </div>
-                <div class="task-meta">
-                    <span class="status-badge" data-status="${escapeAttr(status)}">${escapeHtml(task.status || 'En cours')}</span>
-                </div>
-            </li>
-        `;
-    }, 'Aucune tâche pour le moment.');
-
-    renderList(timelineList, project.timeline, (milestone) => `
-        <li class="data-item">
-            <div>
-                <strong>${escapeHtml(milestone.title || 'Jalon')}</strong>
-                <div class="muted">${escapeHtml(milestone.description || '')}</div>
-            </div>
-            <span class="muted">${formatDate(milestone.date)}</span>
-        </li>
-    `, 'Aucun jalon défini.');
-
-    const baseDrive = project.drive || [];
-    let dynamicDrive = loadDynamic('drive');
-    let dynamicChat = loadDynamic('chat');
-
-    renderDriveItems([...baseDrive, ...dynamicDrive]);
-
-    const initialChat = project.chatNotes
-        ? [{ author: project.owner || 'Chef de projet', content: project.chatNotes, timestamp: project.updatedAt || project.endDate || project.startDate }]
-        : [];
-    renderChatMessages([...initialChat, ...dynamicChat]);
-
-    showPanel('overview');
-
-    if (driveForm) {
-        driveForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const title = driveTitleInput.value.trim();
-            const url = driveUrlInput.value.trim();
-            const type = driveTypeInput.value.trim();
-            if (!title || !url) return;
-            const newResource = {
-                title,
-                url,
-                type: type || 'Lien partagé',
-                id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString()
-            };
-            dynamicDrive = [...dynamicDrive, newResource];
-            saveDynamic('drive', dynamicDrive);
-            renderDriveItems([...baseDrive, ...dynamicDrive]);
-            driveForm.reset();
-        });
-    }
-
-    if (chatForm) {
-        chatForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const message = chatInput.value.trim();
-            if (!message) return;
-            const newMessage = {
-                author: 'Vous',
-                content: message,
-                timestamp: new Date().toISOString()
-            };
-            dynamicChat = [...dynamicChat, newMessage];
-            saveDynamic('chat', dynamicChat);
-            renderChatMessages([...initialChat, ...dynamicChat]);
-            chatForm.reset();
-        });
-    }
-
-    function toggleNavigation(enabled) {
-        navButtons.forEach((button) => {
-            button.disabled = !enabled;
-            if (!enabled) button.classList.remove('active');
-        });
-        if (!enabled) {
-            panelSections.forEach((section) => {
-                section.hidden = true;
-                section.classList.remove('active');
-            });
-        }
-    }
-
-    function findProject() {
-        if (!projectSlug) return null;
-        try {
-            const stored = window.localStorage.getItem(storageKey);
-            if (!stored) return null;
-            const projects = JSON.parse(stored);
-            if (!Array.isArray(projects)) return null;
-            return projects.find((proj) => proj.slug === projectSlug || proj.id === projectSlug) || null;
-        } catch (error) {
-            console.warn('Impossible de charger les projets', error);
-            return null;
-        }
-    }
-
-    function renderList(container, data, templateFn, emptyMessage) {
-        container.innerHTML = '';
-        if (!data || !data.length) {
-            container.innerHTML = `<li class="data-item data-item--empty">${emptyMessage}</li>`;
-            return;
-        }
-        container.innerHTML = data.map(templateFn).join('');
-    }
-
-    function renderDriveItems(items) {
-        renderList(driveList, items, (resource) => `
-            <li class="data-item">
-                <div>
-                    <strong>${escapeHtml(resource.title || 'Document')}</strong>
-                    <div class="muted">${escapeHtml(resource.type || 'Ressource')}</div>
-                </div>
-                <a href="${escapeAttr(resource.url || '#')}" target="_blank" rel="noopener">Ouvrir</a>
-            </li>
-        `, 'Aucun document partagé.');
-    }
-
-    function loadDynamic(section) {
-        try {
-            const raw = window.localStorage.getItem(dynamicKey(section));
-            if (!raw) return [];
-            const parsed = JSON.parse(raw);
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (_) {
-            return [];
-        }
-    }
-
-    function saveDynamic(section, data) {
-        try {
-            window.localStorage.setItem(dynamicKey(section), JSON.stringify(data));
-        } catch (_) {
-            /* ignore */
-        }
-    }
-
-    function dynamicKey(section) {
-        return `guardia.dashboard.${projectSlug}.${section}`;
-    }
-
-    function formatDate(date) {
-        if (!date) return '—';
-        try {
-            return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(date));
-        } catch (_) {
-            return date;
-        }
-    }
-
-    function formatDateTime(date) {
-        if (!date) return '';
-        try {
-            return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(date));
-        } catch (_) {
-            return date;
-        }
-    }
-
-    function escapeHtml(value) {
-        return (value || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-
-    function escapeAttr(value) {
-        return escapeHtml(value).replace(/\"/g, '&quot;');
-    }
-
-    function getNextMilestone(timeline) {
-        if (!timeline || !timeline.length) return '—';
-        try {
-            const withDates = timeline.filter((item) => item.date).sort((a, b) => new Date(a.date) - new Date(b.date));
-            const upcoming = withDates.find((item) => new Date(item.date) >= new Date());
-            const target = upcoming || withDates[0] || timeline[0];
-            const label = target.title || 'Jalon';
-            return target.date ? `${label} • ${formatDate(target.date)}` : label;
-        } catch (_) {
-            return timeline[0].title || 'Jalon';
-        }
-    }
-
-    function updateOverviewStats(project) {
-        const teamCount = (project.team || []).length;
-        const taskCount = (project.tasks || []).length;
-        const nextMilestone = getNextMilestone(project.timeline);
-        const period = `${formatDate(project.startDate)} → ${formatDate(project.endDate)}`;
-        const stats = [
-            { label: 'Membres', value: teamCount },
-            { label: 'Tâches', value: taskCount },
-            { label: 'Prochain jalon', value: nextMilestone },
-            { label: 'Période', value: period }
-        ];
-        overviewStats.innerHTML = stats.map((stat) => `
-            <div class="stat-card">
-                <p>${stat.label}</p>
-                <strong>${stat.value}</strong>
-            </div>
-        `).join('');
-    }
-
-    function renderChatMessages(messages) {
-        chatThread.innerHTML = '';
-        if (!messages || !messages.length) {
-            chatThread.innerHTML = '<p class="chat-empty">Aucun message pour le moment.</p>';
-            return;
-        }
-        chatThread.innerHTML = messages.map((msg) => `
-            <div class="chat-message">
-                <header>
-                    <strong>${escapeHtml(msg.author || 'Anonyme')}</strong>
-                    <time>${formatDateTime(msg.timestamp)}</time>
-                </header>
-                <p>${escapeHtml(msg.content || '')}</p>
-            </div>
-        `).join('');
-    }
-
-    function showPanel(target) {
-        panelSections.forEach((section) => {
-            const isMatch = section.dataset.panel === target;
-            section.hidden = !isMatch;
-            section.classList.toggle('active', isMatch);
-        });
-        navButtons.forEach((button) => {
-            button.classList.toggle('active', button.dataset.panelTarget === target);
-        });
-    }
+    // initial : depuis le hash, le bouton déjà actif ou le premier
+    const fromHash = location.hash ? location.hash.substring(1) : null;
+    const activeBtn = Array.from(navButtons).find(b => b.classList.contains('active'));
+    const initial = fromHash || (activeBtn && activeBtn.dataset.panelTarget) || (navButtons[0] && navButtons[0].dataset.panelTarget);
+    if (initial) showPanel(initial);
 })();
 </script>
 

@@ -416,16 +416,15 @@
 }
 
 
-/* Conteneur : 2 cards par ligne */
 .grid-projets {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
 }
 
-/* Chaque card prend ~50% - gap */
+/* Desktop : 2 par ligne */
 .card-projet {
-  flex: 0 0 calc(50% - 0.75rem);
+  flex: 1 0 calc(50% - 0.75rem); /* 2 colonnes */
   box-sizing: border-box;
 
   position: relative;
@@ -467,20 +466,24 @@
 .card-projet-desc {
   margin: 0;
   font-size: 0.95em;
-  color: #606060;
+  color: #686868;
 }
 
+.card-projet-date {
+  margin: 0;
+  font-size: 0.95em;
+  color: #686868;
+}
 .card-projet-meta {
-  margin-top: auto;                 /* pousse la barre au bas de la card */
+  margin-top: auto;
   padding: 0.6em 1.1em 0.8em;
   display: flex;
   gap: 0.8rem;
-  justify-content: space-between;   /* tout sur une ligne */
+  justify-content: space-between;
   font-size: 0.78rem;
-  color: #464646;
+  color: #9ca3af;
   border-top: 1px solid rgba(148,163,184,0.3);
 }
-
 
 /* Optionnel : sur mobile, 1 par ligne */
 @media (max-width: 600px) {

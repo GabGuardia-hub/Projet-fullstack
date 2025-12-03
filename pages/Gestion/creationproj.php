@@ -1,18 +1,33 @@
-<?php require_once('../../backend/account.php'); 
-require_once('../../backend/env.php');
+<?php require_once'../../backend/account.php'; 
+require_once'../../backend/env.php';
 $errorMsg = "";
 if (isset($_POST['envoie'])) {
 
     if(!empty($_POST['projectName']) AND !empty($_POST['projectStatus']) AND !empty($_POST['projectStart']) AND !empty($_POST['projectEnd'])) {
+        $startObj = $_POST['projectStart'];
+        $endObj   = $_POST['projectEnd'];
+
+        $startObj = DateTime::createFromFormat('Y-m-d', $startObj);
+        $endObj   = DateTime::createFromFormat('Y-m-d', $endObj);
+
+       if (!$startObj || !$endObj) {
+            $errorMsg = "Format de date invalide.";
+        } elseif ($endObj < $startObj) {
+            $errorMsg = "La date de fin ne peut pas être antérieure à la date de début.";
+        } else {
+
+        // Pour insérer en base (Y-m-d)
+        $created_at = $startObj ? $startObj->format('Y-m-d') : null;
+        $fin_prevue = $endObj ? $endObj->format('Y-m-d') : null;
+
+        
+
+
         // Ici on récupere les données de l'insciption //
         $name = htmlspecialchars($_POST['projectName']);
         $description = htmlspecialchars($_POST['projectDescription']);
         $status = htmlspecialchars($_POST['projectStatus']);
-        $created_at = htmlspecialchars($_POST['projectStart']);
         $updated_at = date('Y-m-d H:i:s');
-        $fin_prevue = htmlspecialchars($_POST['projectEnd']);
-
-
         $created_by = $_SESSION['id'];
 
         //On insere les données dans la bdd //
@@ -64,10 +79,17 @@ if (isset($_POST['envoie'])) {
         header("Location: projets.php");
         exit;
 
+
+        $timelineSql = "SELECT label, event_date FROM timeline WHERE projets_id = :projet_id ORDER BY event_date ASC";
+        $timelineStmt = $bdd->prepare($timelineSql);
+        $timelineStmt->execute([':projet_id' => $projectId]);
+        $events = $timelineStmt->fetchAll(PDO::FETCH_ASSOC);
+
+         }
+    } 
     } else {
         $errorMsg = "Tous les champs doivent être complétés !";
     }
-}
 ?>
 
 <!DOCTYPE html>

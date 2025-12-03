@@ -1,6 +1,5 @@
 <?php
-require_once('../../backend/env.php');
-    if (isset($_POST['valider'])) {
+require_once'../../backend/env.php';    if (isset($_POST['valider'])) {
 
         
 

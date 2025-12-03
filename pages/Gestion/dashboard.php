@@ -1,5 +1,5 @@
-<?php require_once('../../backend/account.php'); 
-require_once('../../backend/env.php');
+<?php require_once'../../backend/account.php'; 
+require_once'../../backend/env.php';
 // Vérifier que l'id est présent et numérique
 if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
     die('Projet invalide.');
@@ -20,6 +20,31 @@ $projets->execute([
 ]);
 $projet = $projets->fetch(PDO::FETCH_ASSOC);
 
+// Construire les événements de la chronologie (début + fin pour l'instant)
+$events = [];
+
+// Début du projet
+if (!empty($projet['created_at'])) {
+    $events[] = [
+        'label'      => 'Début du projet',
+        'event_date' => $projet['created_at'],
+    ];
+}
+
+// Fin prévue
+if (!empty($projet['fin_prevue'])) {
+    $events[] = [
+        'label'      => 'Fin prévue',
+        'event_date' => $projet['fin_prevue'],
+    ];
+}
+
+// Trier chronologiquement
+usort($events, function ($a, $b) {
+    return strcmp($a['event_date'], $b['event_date']);
+});
+
+
 $taskSql = "SELECT 
               t.id,
               t.title,
@@ -37,6 +62,8 @@ $taskSql = "SELECT
 $taskStmt = $bdd->prepare($taskSql);
 $taskStmt->execute([':projet_id' => $projectId]);
 $tasks = $taskStmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 if (!$projet) {
     die('Projet introuvable ou non autorisé.');
@@ -231,9 +258,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
         die('Vous ne pouvez pas modifier cette tâche.');
     }
 
-    $sql = "UPDATE task SET status = :status WHERE id = :id";
-    $stmt = $bdd->prepare($sql);
-    $stmt->execute([
+    $Timelinesql = "UPDATE task SET status = :status WHERE id = :id";
+    $Timelinestmt = $bdd->prepare($Timelinesql);
+    $Timelinestmt->execute([
         ':status' => $newStatus,
         ':id'     => $taskId
     ]);
@@ -510,8 +537,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                     <h2>Chronologie</h2>
                     <p class="panel-subtitle">Jalons et dates clés</p>
                 </div>
-                <ul class="data-list" id="timelineList"></ul>
+
+                <?php if (!$events): ?>
+                    <p class="muted">Aucune date clé n’a encore été définie pour ce projet.</p>
+                <?php else: ?>
+                    <div class="timeline-wrapper">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-events">
+                            <?php foreach ($events as $event): ?>
+                                <div class="timeline-item">
+                                    <span class="timeline-dot"></span>
+                                    <span class="timeline-date">
+                                        <?= htmlspecialchars($event['event_date']) ?>
+                                    </span>
+                                    <span class="timeline-label">
+                                        <?= htmlspecialchars($event['label']) ?>
+                                    </span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </article>
+
+
 
             <!-- DRIVE -->
             <article class="panel" data-panel="drive" hidden>

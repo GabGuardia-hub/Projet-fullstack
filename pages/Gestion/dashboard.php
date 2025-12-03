@@ -1,5 +1,5 @@
-<?php require('../../backend/account.php'); 
-require('../../backend/env.php');
+<?php require_once('../../backend/account.php'); 
+require_once('../../backend/env.php');
 // Vérifier que l'id est présent et numérique
 if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
     die('Projet invalide.');

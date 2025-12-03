@@ -1,6 +1,6 @@
 <?php
-require('account.php');
-require('env.php');
+require_once('account.php');
+require_once('env.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: projets.php');

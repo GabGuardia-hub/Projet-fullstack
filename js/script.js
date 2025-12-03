@@ -2,49 +2,6 @@
 // ============= THEME MANAGEMENT =============
 // script.js - GitHub-style Account Settings
 
-// ============= THEME MANAGEMENT =============
-function toggleTheme() {
-    const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme') || 'light';
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    setTheme(newTheme);
-}
-
-function setTheme(theme) {
-    const html = document.documentElement;
-    
-    if (theme === 'auto') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    } else {
-        html.setAttribute('data-theme', theme);
-    }
-    
-    localStorage.setItem('theme', theme);
-    
-    // Update radio buttons
-    const themeRadios = document.querySelectorAll('input[name="theme"]');
-    themeRadios.forEach(radio => {
-        radio.checked = radio.value === theme;
-    });
-}
-
-// Load saved theme on page load
-document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-    
-    // Listen for system theme changes if auto is selected
-    if (savedTheme === 'auto') {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (localStorage.getItem('theme') === 'auto') {
-                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-            }
-        });
-    }
-});
-
 // ============= NAVIGATION =============
 function showSection(sectionId) {
     // Hide all sections

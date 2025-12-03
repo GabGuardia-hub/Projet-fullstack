@@ -42,14 +42,46 @@ header {
 }
 
 .logo {
-    text-decoration: none;
+    text-decoration: none !important;
     font-weight: 700;
     font-size: 1.4rem;
     letter-spacing: -0.5px;
     z-index: 1;
+    
 }
 
-.logo span { color: var(--primary); }
+.top-nav a {
+    text-decoration: none !important;
+}
+
+/* Styles pour le logo */
+.logo {
+    text-decoration: none !important;
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+    z-index: 1;
+    
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+}
+
+/* Icône du logo (cachée) */
+.logo-icon {
+    display: none;
+}
+
+
+/* Suppression des marges et paddings sur les spans du logo */
+.logo span {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
 
 .header-actions {
     display: flex;
@@ -330,3 +362,4 @@ main {
     75% { transform: translateX(2px); }
     100% { transform: translateX(0); }
 }
+

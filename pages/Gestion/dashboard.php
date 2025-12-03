@@ -260,13 +260,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
 <div class="promanage-dashboard">
     <aside class="dashboard-sidebar">
         <div class="sidebar-header">
-            <div class="logo">
-                <span class="logo-icon">GP</span>
-                <div>
-                    <span>GuardiaProjets</span>
-                    <small>Dashboard</small>
-                </div>
-            </div>
+            <a href="/Projet-fullstack/index.php" class="logo">
+                <span class="guardia">Guardia</span><span class="projets">Projets</span>
+            </a>
         </div>
         <nav class="sidebar-nav">
             <div>
@@ -504,16 +500,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                 <?php endif; ?>
             </article>
 
-            <!-- TIMELINE -->
-            <article class="panel" data-panel="timeline" hidden>
-                <div class="panel-header">
-                    <h2>Chronologie</h2>
-                    <p class="panel-subtitle">Jalons et dates clés</p>
-                </div>
-                <ul class="data-list" id="timelineList"></ul>
-            </article>
-
-            <!-- DRIVE -->
+<!-- DRIVE -->
             <article class="panel" data-panel="drive" hidden>
                 <div class="panel-header">
                     <h2>Drive & ressources</h2>

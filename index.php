@@ -12,6 +12,87 @@ session_start();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Styles pour le carrousel */
+        .trust-section {
+            padding: 60px 0;
+            background: #f8f9fa;
+            overflow: hidden;
+            margin: 80px 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .logo-carousel {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .logo-track {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            width: calc(250px * 14);
+        }
+
+        .logo-slide {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo-item {
+            flex: 0 0 200px;
+            height: 100px;
+            margin: 0 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .logo-item img:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-250px * 7)); }
+        }
+
+        .logo-carousel:hover .logo-track {
+            animation-play-state: paused;
+        }
+
+        @media (max-width: 768px) {
+            .logo-track {
+                animation: scroll 20s linear infinite;
+            }
+            
+            .logo-item {
+                flex: 0 0 150px;
+                height: 80px;
+                margin: 0 15px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -115,33 +196,56 @@ session_start();
             </div>
         </section>
 
-        <div class="trust-logos">
-            Adopté par les équipes tel que
-            <ul>
-                <li>Hubert</li>
-                <li>Welcome to the Forest</li>
-                <li>Rondpoint</li>
-                <li>Renée</li>
-                <li>Angine</li>
-                <li>Lemauvaiscoin</li>
-            </ul>
+        <div class="trust-section">
+            <div class="section-title">Adopté par les équipes de :</div>
+            <div class="logo-carousel">
+                <div class="logo-track">
+                    <div class="logo-slide">
+                        <div class="logo-item"><img src="IMG/479a9496-1c79-41c6-9e2e-12c1362428b6-removebg-preview.png" alt="Logo 1"></div>
+                        <div class="logo-item"><img src="IMG/651de675-655e-4299-8554-9c58f853439a-removebg-preview (1).png" alt="Logo 2"></div>
+                        <div class="logo-item"><img src="IMG/8fc56def-76da-4f9c-ab04-783d21efa483-removebg-preview.png" alt="Logo 3"></div>
+                        <div class="logo-item"><img src="IMG/a1033db9-8bb8-4ac0-a1d7-e94592cf34da-removebg-preview.png" alt="Logo 4"></div>
+                        <div class="logo-item"><img src="IMG/d4e27bae-1958-4821-890b-67b4d4321e90-removebg-preview.png" alt="Logo 5"></div>
+                        <div class="logo-item"><img src="IMG/e4e3dc53-bdaf-4e19-a3ca-85a2919c8149-removebg-preview.png" alt="Logo 6"></div>
+                        <!-- Doubler les éléments pour une boucle fluide -->
+                        <div class="logo-item"><img src="IMG/479a9496-1c79-41c6-9e2e-12c1362428b6-removebg-preview.png" alt="Logo 1"></div>
+                        <div class="logo-item"><img src="IMG/651de675-655e-4299-8554-9c58f853439a-removebg-preview (1).png" alt="Logo 2"></div>
+                        <div class="logo-item"><img src="IMG/8fc56def-76da-4f9c-ab04-783d21efa483-removebg-preview.png" alt="Logo 3"></div>
+                        <div class="logo-item"><img src="IMG/a1033db9-8bb8-4ac0-a1d7-e94592cf34da-removebg-preview.png" alt="Logo 4"></div>
+                        <div class="logo-item"><img src="IMG/d4e27bae-1958-4821-890b-67b4d4321e90-removebg-preview.png" alt="Logo 5"></div>
+                        <div class="logo-item"><img src="IMG/e4e3dc53-bdaf-4e19-a3ca-85a2919c8149-removebg-preview.png" alt="Logo 6"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </main>
 
-    <script>
-        const workflows = {
-            projets: {
-                description: "Planifiez les jalons clés, attribuez les responsables et visualisez vos progrès en un coup d'œil.",
-                image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=900&q=80"
-            },
-            taches: {
-                description: "Construisez des listes de tâches ultra-visuelles avec statuts, priorités et échéances synchronisées.",
-                image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80"
-            },
-            design: {
-                description: "Centralisez les briefs créatifs, retours clients et validations d'équipes design.",
-                image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=900&q=80"
-            },
+        <script>
+            const workflows = {
+                projets: {
+                    description: "Planifiez les jalons clés, attribuez les responsables et visualisez vos progrès en un coup d'œil.",
+                    image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=900&q=80"
+                },
+                taches: {
+                    description: "Construisez des listes de tâches ultra-visuelles avec statuts, priorités et échéances synchronisées.",
+                    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80"
+                },
+                design: {
+                    description: "Centralisez les briefs créatifs, retours clients et validations d'équipes design.",
+                    image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=900&q=80"
+                },
+                logiciels: {
+                    description: "Synchronisez vos roadmaps produit, releases et pipelines d'intégration continue.",
+                    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80"
+                },
+                informatique: {
+                    description: "Priorisez tickets d'assistance, incidents critiques et opérations d'infrastructure.",
+                    image: "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=900&q=80"
+                },
+                operations: {
+                    description: "Harmonisez vos processus opérations, finances et logistique dans un tableau unique.",
+                    image: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80"
+                }
+            };
             logiciels: {
                 description: "Synchronisez vos roadmaps produit, releases et pipelines d'intégration continue.",
                 image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80"

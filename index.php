@@ -14,115 +14,91 @@ session_start();
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* Styles pour le carrousel */
-        .trust-section {
-            padding: 0;
-            background: transparent;
-            overflow: hidden;
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
             margin: 0;
-            position: fixed;
-            bottom: 0;
-            left: 0;
+            padding: 0;
+        }
+
+        main {
+            flex: 1;
+            padding-bottom: 40px; /* Réduction de l'espace en bas */
+            position: relative;
+        }
+
+        .trust-section {
             width: 100%;
-            height: 200px;
-            z-index: -1;
+            max-width: 100%;
+            background: transparent;
+            padding: 0;
+            margin: 60px 0 0 0;
+            overflow: hidden;
         }
 
         .section-title {
             text-align: center;
-            font-size: 1.1rem;
-            color: #6b7280;
-            margin-bottom: 10px;
-            font-weight: 500;
-            position: absolute;
-            bottom: 180px; /* Positionné au-dessus du carrousel */
-            left: 0;
-            right: 0;
-            z-index: 1;
+            margin-bottom: 15px;
             color: #4b5563;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+            font-size: 1.1rem;
         }
 
         .logo-carousel {
             width: 100%;
-            height: 200px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: -1;
-            display: flex;
-            align-items: flex-end;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            white-space: nowrap;
         }
 
         .logo-track {
-            display: flex;
-            animation: scroll 40s linear infinite;
-            width: max-content;
-            will-change: transform;
-            gap: 40px;
-            align-items: center;
-            padding: 0 20px;
-            height: 100%;
+            display: inline-block;
+            white-space: nowrap;
+            animation: scroll 30s linear infinite;
+            padding: 30px 0;
+            width: 100%;
         }
 
         .logo-item {
-            flex: 0 0 auto;
-            height: 80%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-block;
+            padding: 0 70px;
+            vertical-align: middle;
             transition: all 0.3s ease;
-            padding: 0 20px;
         }
 
         .logo-item img {
-            max-width: 100%;
-            max-height: 100%;
+            height: 120px;
             width: auto;
-            height: auto;
-            object-fit: contain;
-            opacity: 0.8;
+            max-width: 300px;
+            opacity: 0.9;
             transition: all 0.3s ease;
-            filter: grayscale(0%);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .logo-item:hover img {
             opacity: 1;
             transform: scale(1.2);
+            filter: brightness(1.1);
         }
 
         @keyframes scroll {
-            0% {
+            0% { 
                 transform: translateX(0);
             }
-            100% {
-                transform: translateX(calc(-50% - 10px));
+            100% { 
+                transform: translateX(-50%);
             }
+        }
+        
+        .logo-item:hover {
+            transform: scale(1.1);
         }
 
         @media (max-width: 1024px) {
             .logo-item {
-                height: 70%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .logo-track {
-                animation-duration: 30s;
-            }
-            
-            .logo-item {
-                height: 60%;
-                padding: 0 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logo-item {
-                height: 50%;
+                height: 50px;
             }
         }
     </style>
@@ -233,21 +209,19 @@ session_start();
             <div class="section-title">Adopté par les équipes de :</div>
             <div class="logo-carousel">
                 <div class="logo-track">
-                    <div class="logo-slide">
-                        <div class="logo-item"><img src="IMG/479a9496-1c79-41c6-9e2e-12c1362428b6-removebg-preview.png" alt="Logo 1"></div>
-                        <div class="logo-item"><img src="IMG/651de675-655e-4299-8554-9c58f853439a-removebg-preview (1).png" alt="Logo 2"></div>
-                        <div class="logo-item"><img src="IMG/8fc56def-76da-4f9c-ab04-783d21efa483-removebg-preview.png" alt="Logo 3"></div>
-                        <div class="logo-item"><img src="IMG/a1033db9-8bb8-4ac0-a1d7-e94592cf34da-removebg-preview.png" alt="Logo 4"></div>
-                        <div class="logo-item"><img src="IMG/d4e27bae-1958-4821-890b-67b4d4321e90-removebg-preview.png" alt="Logo 5"></div>
-                        <div class="logo-item"><img src="IMG/e4e3dc53-bdaf-4e19-a3ca-85a2919c8149-removebg-preview.png" alt="Logo 6"></div>
-                        <!-- Doubler les éléments pour une boucle fluide -->
-                        <div class="logo-item"><img src="IMG/479a9496-1c79-41c6-9e2e-12c1362428b6-removebg-preview.png" alt="Logo 1"></div>
-                        <div class="logo-item"><img src="IMG/651de675-655e-4299-8554-9c58f853439a-removebg-preview (1).png" alt="Logo 2"></div>
-                        <div class="logo-item"><img src="IMG/8fc56def-76da-4f9c-ab04-783d21efa483-removebg-preview.png" alt="Logo 3"></div>
-                        <div class="logo-item"><img src="IMG/a1033db9-8bb8-4ac0-a1d7-e94592cf34da-removebg-preview.png" alt="Logo 4"></div>
-                        <div class="logo-item"><img src="IMG/d4e27bae-1958-4821-890b-67b4d4321e90-removebg-preview.png" alt="Logo 5"></div>
-                        <div class="logo-item"><img src="IMG/e4e3dc53-bdaf-4e19-a3ca-85a2919c8149-removebg-preview.png" alt="Logo 6"></div>
-                    </div>
+                    <div class="logo-item"><img src="IMG/479a9496-1c79-41c6-9e2e-12c1362428b6-removebg-preview.png" alt="Logo 1"></div>
+                    <div class="logo-item"><img src="IMG/651de675-655e-4299-8554-9c58f853439a-removebg-preview (1).png" alt="Logo 2"></div>
+                    <div class="logo-item"><img src="IMG/8fc56def-76da-4f9c-ab04-783d21efa483-removebg-preview.png" alt="Logo 3"></div>
+                    <div class="logo-item"><img src="IMG/a1033db9-8bb8-4ac0-a1d7-e94592cf34da-removebg-preview.png" alt="Logo 4"></div>
+                    <div class="logo-item"><img src="IMG/d4e27bae-1958-4821-890b-67b4d4321e90-removebg-preview.png" alt="Logo 5"></div>
+                    <div class="logo-item"><img src="IMG/e4e3dc53-bdaf-4e19-a3ca-85a2919c8149-removebg-preview.png" alt="Logo 6"></div>
+                    <!-- Doubler les éléments pour une boucle fluide -->
+                    <div class="logo-item"><img src="IMG/479a9496-1c79-41c6-9e2e-12c1362428b6-removebg-preview.png" alt="Logo 1"></div>
+                    <div class="logo-item"><img src="IMG/651de675-655e-4299-8554-9c58f853439a-removebg-preview (1).png" alt="Logo 2"></div>
+                    <div class="logo-item"><img src="IMG/8fc56def-76da-4f9c-ab04-783d21efa483-removebg-preview.png" alt="Logo 3"></div>
+                    <div class="logo-item"><img src="IMG/a1033db9-8bb8-4ac0-a1d7-e94592cf34da-removebg-preview.png" alt="Logo 4"></div>
+                    <div class="logo-item"><img src="IMG/d4e27bae-1958-4821-890b-67b4d4321e90-removebg-preview.png" alt="Logo 5"></div>
+                    <div class="logo-item"><img src="IMG/e4e3dc53-bdaf-4e19-a3ca-85a2919c8149-removebg-preview.png" alt="Logo 6"></div>
                 </div>
             </div>
         </div>

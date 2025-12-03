@@ -16,7 +16,7 @@ session_start();
         /* Styles pour le carrousel */
         .trust-section {
             padding: 60px 0;
-            background: #f8f9fa;
+            background: var(--bg);
             overflow: hidden;
             margin: 80px 0;
             position: relative;
@@ -39,7 +39,9 @@ session_start();
         .logo-track {
             display: flex;
             animation: scroll 30s linear infinite;
-            width: calc(250px * 14);
+            width: calc(300px * 14);
+            gap: 0;
+            margin: 0 -10px;
         }
 
         .logo-slide {
@@ -49,9 +51,10 @@ session_start();
         }
 
         .logo-item {
-            flex: 0 0 200px;
-            height: 100px;
-            margin: 0 25px;
+            flex: 0 0 300px;
+            height: 160px;
+            margin: 0;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -74,12 +77,10 @@ session_start();
 
         @keyframes scroll {
             0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-250px * 7)); }
+            100% { transform: translateX(calc(-300px * 7)); }
         }
 
-        .logo-carousel:hover .logo-track {
-            animation-play-state: paused;
-        }
+        /* L'animation continue même au survol */
 
         @media (max-width: 768px) {
             .logo-track {
@@ -87,9 +88,10 @@ session_start();
             }
             
             .logo-item {
-                flex: 0 0 150px;
-                height: 80px;
-                margin: 0 15px;
+                flex: 0 0 240px;
+                height: 120px;
+                margin: 0;
+                padding: 0;
             }
         }
     </style>

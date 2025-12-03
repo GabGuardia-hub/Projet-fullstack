@@ -177,8 +177,8 @@
         .sign-up-btn,
         .btn.retour-btn,
         .retour-btn {
-            background-color: var(--white);
-            color: var(--primary);
+            background-color: var(--primary);
+            color: var(--white);
             border: 1px solid var(--gray-200);
             box-shadow: none;
             transition: background-color 0.25s, color 0.25s, transform 0.2s;

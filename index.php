@@ -15,83 +15,114 @@ session_start();
     <style>
         /* Styles pour le carrousel */
         .trust-section {
-            padding: 60px 0;
-            background: var(--bg);
+            padding: 0;
+            background: transparent;
             overflow: hidden;
-            margin: 80px 0;
-            position: relative;
+            margin: 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            z-index: -1;
         }
 
         .section-title {
             text-align: center;
             font-size: 1.1rem;
             color: #6b7280;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-weight: 500;
+            position: absolute;
+            bottom: 180px; /* Positionné au-dessus du carrousel */
+            left: 0;
+            right: 0;
+            z-index: 1;
+            color: #4b5563;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
         }
 
         .logo-carousel {
             width: 100%;
+            height: 200px;
             overflow: hidden;
-            position: relative;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: -1;
+            display: flex;
+            align-items: flex-end;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
         }
 
         .logo-track {
             display: flex;
-            animation: scroll 30s linear infinite;
-            width: calc(300px * 14);
-            gap: 0;
-            margin: 0 -10px;
-        }
-
-        .logo-slide {
-            display: flex;
+            animation: scroll 40s linear infinite;
+            width: max-content;
+            will-change: transform;
+            gap: 40px;
             align-items: center;
-            width: 100%;
+            padding: 0 20px;
+            height: 100%;
         }
 
         .logo-item {
-            flex: 0 0 300px;
-            height: 160px;
-            margin: 0;
-            padding: 0;
+            flex: 0 0 auto;
+            height: 80%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            padding: 0 20px;
         }
 
         .logo-item img {
             max-width: 100%;
             max-height: 100%;
+            width: auto;
+            height: auto;
             object-fit: contain;
-            opacity: 0.7;
+            opacity: 0.8;
             transition: all 0.3s ease;
+            filter: grayscale(0%);
         }
 
-        .logo-item img:hover {
-            filter: grayscale(0%);
+        .logo-item:hover img {
             opacity: 1;
-            transform: scale(1.05);
+            transform: scale(1.2);
         }
 
         @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-300px * 7)); }
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-50% - 10px));
+            }
         }
 
-        /* L'animation continue même au survol */
+        @media (max-width: 1024px) {
+            .logo-item {
+                height: 70%;
+            }
+        }
 
         @media (max-width: 768px) {
             .logo-track {
-                animation: scroll 20s linear infinite;
+                animation-duration: 30s;
             }
             
             .logo-item {
-                flex: 0 0 240px;
-                height: 120px;
-                margin: 0;
-                padding: 0;
+                height: 60%;
+                padding: 0 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-item {
+                height: 50%;
             }
         }
     </style>

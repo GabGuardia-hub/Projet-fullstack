@@ -1,5 +1,5 @@
-<?php require('../../backend/account.php'); 
-require('../../backend/env.php');
+<?php require_once('../../backend/account.php'); 
+require_once('../../backend/env.php');
 $errorMsg = "";
 if (isset($_POST['envoie'])) {
 

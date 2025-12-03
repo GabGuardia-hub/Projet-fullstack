@@ -1,14 +1,14 @@
 <?php
 
 session_start();
-require __DIR__ . '/../../backend/env.php';
+require_once __DIR__ . '/../../backend/env.php';
 
 $host = $_ENV['DB_HOST'];
 $db   = $_ENV['DB_NAME'];
 $user = $_ENV['DB_USER'];
 $pass = $_ENV['DB_PASS'];
 
-require('../../backend/env.php');
+require_once('../../backend/env.php');
 
 $errorMsg = "";
 

@@ -1,7 +1,7 @@
 <?php
-require('../../backend/account.php');
+require_once('../../backend/account.php');
 
-require('../../backend/env.php');
+require_once('../../backend/env.php');
     if (isset($_POST['valider'])) {
 
         
@@ -17,7 +17,6 @@ require('../../backend/env.php');
             $_SESSION['firstName'] = $newfirstName;
             $_SESSION['email'] = $newemail;
             $_SESSION['phone'] = $newphone;
-            $_SESSION['id'] = $_SESSION['id'];
             
             $updateUser = $bdd->prepare("UPDATE users SET lastName = ?, firstName = ?, email = ?, phone = ? WHERE id = ?");
             $updateUser->execute(array($newlastName, $newfirstName, $newemail, $newphone, $_SESSION['id']));

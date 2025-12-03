@@ -1,6 +1,6 @@
 <?php
-require('../../backend/account.php');
-require('../../backend/env.php');
+require_once('../../backend/account.php');
+require_once('../../backend/env.php');
 
 // Récupérer tous les projets où l'utilisateur connecté est membre
 $sql = "

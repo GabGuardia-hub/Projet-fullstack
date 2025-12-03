@@ -8,8 +8,7 @@ $db   = $_ENV['DB_NAME'];
 $user = $_ENV['DB_USER'];
 $pass = $_ENV['DB_PASS'];
 
-require_once('../../backend/env.php');
-
+require_once'../../backend/env.php';
 $errorMsg = "";
 
 if (isset($_POST['envoie'])) {

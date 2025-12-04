@@ -256,8 +256,6 @@ main {
 
 /* Style pour masquer les flèches du sélecteur de workflow */
 .workflow-option {
-    border: none !important;
-    background: none !important;
     appearance: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -325,29 +323,138 @@ main {
     gap: 16px;
 }
 
+/* Styles de base pour les boutons de workflow */
 .workflow-option {
-    border: 1px solid rgba(31, 31, 36, 0.08);
-    border-radius: 22px;
-    padding: 18px;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px 12px;
+    transition: all 0.2s ease;
     cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #f5f5f5;
+    color: #333;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-height: 100px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.workflow-option::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(135deg, rgba(98, 70, 234, 0.05), transparent) !important;
+    transition: all 0.3s ease !important;
+    z-index: 0 !important;
+    opacity: 0 !important;
 }
 
 .workflow-option svg {
-    width: 28px;
-    height: 28px;
-    color: var(--primary);
+    width: 28px !important;
+    height: 28px !important;
+    color: var(--primary) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    transition: all 0.3s ease !important;
 }
 
-.workflow-option.active {
-    border-color: rgba(98, 70, 234, 0.6);
-    box-shadow: 0 15px 30px rgba(98, 70, 234, 0.15);
+.workflow-option span {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Effet de survol */
+.workflow-option:hover {
+    background: #e9e9e9;
+    border-color: #ccc;
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* État actif */
+.workflow-option.active {
+    background: #e6e6ff;
+    border-color: #6246ea;
+    border-left: 4px solid #6246ea;
+    font-weight: 600;
+}
+
+/* Styles des icônes */
+.workflow-option svg {
+    width: 28px;
+    height: 28px;
+    transition: transform 0.2s ease;
+}
+
+.workflow-option:hover svg {
+    transform: scale(1.1);
+}
+
+/* Texte sous les icônes */
+.workflow-option span {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+/* Grille des boutons */
+.workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+}
+
+/* Section workflow */
+.workflow-section {
+    padding: 40px 0;
+    background: #fff;
+}
+
+.workflow-selector {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.workflow-preview {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.workflow-preview img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.workflow-description {
+    margin: 20px 0;
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .workflow-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .workflow-option {
+        min-height: 90px;
+    }
 }
 
 .workflow-description {

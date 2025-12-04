@@ -137,30 +137,70 @@ session_start();
         </div>
 
         <script>
-            const workflows = {
-                projets: {
-                    description: "Planifiez les jalons clés, attribuez les responsables et visualisez vos progrès en un coup d'œil.",
-                    image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=900&q=80"
-                },
-                taches: {
-                    description: "Construisez des listes de tâches ultra-visuelles avec statuts, priorités et échéances synchronisées.",
-                    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80"
-                },
-                design: {
-                    description: "Centralisez les briefs créatifs, retours clients et validations d'équipes design.",
-                    image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=900&q=80"
-                },
-                logiciels: {
-                    description: "Synchronisez vos roadmaps produit, releases et pipelines d'intégration continue.",
-                    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80"
-                },
-                informatique: {
-                    description: "Priorisez tickets d'assistance, incidents critiques et opérations d'infrastructure.",
-                    image: "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=900&q=80"
-                },
-                operations: {
-                    description: "Harmonisez vos processus opérations, finances et logistique dans un tableau unique.",
-                    image: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80"
+            document.addEventListener('DOMContentLoaded', function() {
+                const workflows = {
+                    projets: {
+                        description: "Planifiez les jalons clés, attribuez les responsables et visualisez vos progrès en un coup d'œil.",
+                        image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80"
+                    },
+                    taches: {
+                        description: "Construisez des listes de tâches ultra-visuelles avec statuts, priorités et échéances synchronisées.",
+                        image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=900&q=80"
+                    },
+                    design: {
+                        description: "Centralisez les briefs créatifs, retours clients et validations d'équipes design.",
+                        image: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80"
+                    },
+                    logiciels: {
+                        description: "Synchronisez vos roadmaps produit, releases et pipelines d'intégration continue.",
+                        image: "IMG/Logiciels.jpg"
+                    },
+                    informatique: {
+                        description: "Priorisez tickets d'assistance, incidents critiques et opérations d'infrastructure.",
+                        image: "IMG/InfoProg.jpg"
+                    },
+                    operations: {
+                        description: "Harmonisez vos processus opérations, finances et logistique dans un tableau unique.",
+                        image: "IMG/Operations.jpg"
+                    }
+                };
+
+                const workflowImage = document.getElementById('workflowImage');
+                const workflowDescription = document.getElementById('workflowDescription');
+                const workflowGrid = document.getElementById('workflowGrid');
+
+                // Vérifier que les éléments existent avant d'ajouter les écouteurs
+                if (workflowGrid && workflowImage && workflowDescription) {
+                    workflowGrid.addEventListener('click', (event) => {
+                        const button = event.target.closest('.workflow-option');
+                        if (!button) return;
+
+                        const key = button.dataset.workflow;
+                        const config = workflows[key];
+                        if (!config) return;
+
+                        // Mettre à jour les classes actives
+                        workflowGrid.querySelectorAll('.workflow-option').forEach((opt) => {
+                            opt.classList.remove('active');
+                        });
+                        button.classList.add('active');
+
+                        // Mettre à jour l'image et la description
+                        workflowImage.src = config.image;
+                        workflowImage.alt = `Aperçu ${key}`;
+                        workflowDescription.textContent = config.description;
+
+                        // Forcer le rechargement de l'image en cas de changement
+                        workflowImage.style.display = 'none';
+                        void workflowImage.offsetWidth; // Déclencher un reflow
+                        workflowImage.style.display = 'block';
+                    });
+
+                    // Définir l'image par défaut au chargement
+                    const defaultButton = workflowGrid.querySelector('.workflow-option[data-workflow="projets"]');
+                    if (defaultButton) {
+                        defaultButton.click();
+                    }
                 }
             };
             logiciels: {
@@ -201,4 +241,8 @@ session_start();
         });
     </script>
 </body>
+
+            });
+        </script>
+    </body>
 </html>

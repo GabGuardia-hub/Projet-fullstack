@@ -1,3 +1,4 @@
+
 /* CSS PROJET */
 :root {
     --primary: #6246ea;
@@ -254,6 +255,7 @@ main {
     box-shadow: 0 20px 50px rgba(79, 70, 229, 0.25);
 }
 
+
 /* Style pour masquer les flèches du sélecteur de workflow */
 .workflow-option {
     border: none !important;
@@ -322,88 +324,181 @@ main {
 
 .workflow-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+    margin-top: 24px;
 }
 
 .workflow-option {
-    border: 1px solid rgba(31, 31, 36, 0.08);
-    border-radius: 22px;
-    padding: 18px;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    padding: 20px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background: white;
+    text-align: center;
     cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.workflow-option svg {
-    width: 28px;
-    height: 28px;
-    color: var(--primary);
+.workflow-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: rgba(98, 70, 234, 0.3);
 }
 
 .workflow-option.active {
-    border-color: rgba(98, 70, 234, 0.6);
-    box-shadow: 0 15px 30px rgba(98, 70, 234, 0.15);
-    transform: translateY(-2px);
+    border: 2px solid #6246ea;
+    background-color: #f8f7ff;
 }
 
-.workflow-description {
-    margin: 24px 0 32px;
-    color: var(--muted);
-    font-size: 0.95rem;
+.workflow-option svg {
+    width: 24px;
+    height: 24px;
+    color: #6246ea;
 }
 
-.trust-logos {
-    margin-top: 80px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.9rem;
+.workflow-option.active svg {
+    color: #6246ea;
 }
 
-.trust-logos ul {
-    list-style: none;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 32px;
-    margin-top: 18px;
+.workflow-option span {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.workflow-option.active span {
+    color: #6246ea;
     font-weight: 600;
-    letter-spacing: 1px;
 }
 
-@media (max-width: 768px) {
-    .workflow-grid { grid-template-columns: 1fr; }
-    .workflow-section { padding: 28px; }
-    .workflow-preview { order: 1; }
-    .workflow-selector { order: 2; }
+/* Styles pour la page de compte */
+.settings-container {
+    display: flex;
+    min-height: calc(100vh - 80px);
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
-.error-message {
-    background: #ffeaea;
-    color: #b00020;
-    border: 1px solid #d32f2f;
-    border-radius: 5px;
-    padding: 12px 20px;
-    
-    margin-top: 20px;
-    margin-left: auto;
-    margin-right: auto;
+.settings-sidebar {
+    width: 280px;
+    background: #f8f9fa;
+    border-right: 1px solid #eaecef;
+    padding: 24px 0;
+}
+
+.settings-nav {
+    padding: 0 16px;
+}
+
+.nav-section {
+    margin-bottom: 24px;
+}
+
+.nav-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6a737d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px 16px;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    margin: 4px 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    color: #24292e;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.nav-link:hover {
+    background-color: #eaecef;
+    color: #24292e;
+}
+
+.nav-link.active {
+    background-color: #e1e4e8;
+    font-weight: 600;
+    color: #24292e;
+}
+
+.nav-icon {
+    margin-right: 12px;
+    color: #6a737d;
+    width: 20px;
+    height: 20px;
+}
+
+.settings-main {
+    flex: 1;
+    padding: 40px;
+    background: #fff;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.content-header {
+    margin-bottom: 32px;
+}
+
+.content-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px;
+}
+
+.content-description {
+    color: #6a737d;
+    margin: 0;
+    font-size: 14px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Styles pour les formulaires */
+.form-group {
     margin-bottom: 20px;
-    font-size: 1rem;
-    text-align: center;
-    animation: shake .25s;
 }
 
-@keyframes shake {
-    0% { transform: translateX(-2px); }
-    25% { transform: translateX(2px); }
-    50% { transform: translateX(-2px); }
-    75% { transform: translateX(2px); }
-    100% { transform: translateX(0); }
+.form-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #1f1f24;
 }
         /* Styles pour le carrousel */
         body {
@@ -535,4 +630,41 @@ main {
 #chatThread {
   flex: 1 1 auto;            /* prend tout l’espace dispo */
   overflow-y: auto;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #6246ea;
+    box-shadow: 0 0 0 2px rgba(98, 70, 234, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .workflow-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .settings-container {
+        flex-direction: column;
+    }
+    
+    .settings-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #eaeaea;
+    }
+    
+    .settings-main {
+        padding: 24px;
+    }
 }

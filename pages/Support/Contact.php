@@ -33,7 +33,7 @@ session_start();
                 </div>
                 <div class="category-card" style="background: linear-gradient(160deg, #ec4899, #db2777);">
                     <strong>Langues</strong>
-                    <span>Français, Anglais, Espagnol</span>
+                    <span>Français, Anglais </span>
                 </div>
             </div>
         </section>
@@ -57,8 +57,8 @@ session_start();
             <div class="workflow-preview" style="order:1;">
                 <div class="preview-pill">Adresse</div>
                 <div style="background:#fff;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px;height:100%;">
-                    <strong>Paris - Quartier Opéra</strong>
-                    <p>45 Rue du Projet<br>75002 Paris, France</p>
+                    <strong>Puteaux - Terasse Bellini</strong>
+                    <p>22 Ter Bellini<br>92062 Puteaux, France</p>
                     <strong>Besoin d'un rendez-vous ?</strong>
                     <p>Réservez un créneau visio directement depuis votre espace "Mon compte".</p>
                 </div>

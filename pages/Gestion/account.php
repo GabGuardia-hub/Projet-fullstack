@@ -1,5 +1,7 @@
+
 <?php
 require_once('../../backend/account.php');
+
 require_once '../../backend/env.php';
 
 // Vérifier si le formulaire a été soumis
@@ -41,27 +43,45 @@ echo '<a id="top"></a>';
         }
         
         body {
-            padding-top: 0;
-            margin-top: 70px; /* Hauteur de la navbar */
+            padding-top: 70px; /* Hauteur de la navbar */
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
         }
         
-        /* Style pour la navbar fixe */
         header {
             position: fixed;
             top: 0;
-            width: 100%;
-            z-index: 1000;
+            left: 0;
+            right: 0;
             background: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            height: 70px;
+            display: flex;
+            align-items: center;
         }
         
-        /* Ajustement pour le contenu principal */
         .settings-container {
             min-height: calc(100vh - 70px);
-            background: var(--bg);
-            padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            gap: 30px;
+        }
+        
+        .settings-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .settings-main {
+            flex: 1;
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
@@ -440,36 +460,5 @@ echo '<a id="top"></a>';
     </div>
 
     <script src="../../js/script.js"></script>
-    <script>
-        // Initialisation de la navigation
-        document.addEventListener('DOMContentLoaded', function() {
-            // Afficher la section active au chargement
-            const hash = window.location.hash.replace('#', '') || 'account';
-            showSection(hash);
-            
-            // Gérer les clics sur les liens de navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const sectionId = this.getAttribute('href').replace('#', '');
-                    showSection(sectionId);
-                    window.location.hash = sectionId;
-                });
-            });
-        });
-        
-        function showSection(sectionId) {
-            // Masquer toutes les sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Afficher la section sélectionnée
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.style.display = 'block';
-            }
-        }
-    </script>
 </body>
 </html>

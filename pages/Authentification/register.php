@@ -6,6 +6,7 @@ if (isset($_POST['envoie'])) {
 
     if(!empty($_POST['lastName']) AND !empty($_POST['firstName']) AND !empty($_POST['email']) AND !empty($_POST['password']) AND !empty($_POST['confirmPassword'])) {
         
+        $token = bin2hex(random_bytes(32)); 
         
         // Ici on récupere les données de l'insciption //
         $lastName = htmlspecialchars($_POST['lastName']);
@@ -17,12 +18,19 @@ if (isset($_POST['envoie'])) {
         
         // En gros ici, on creer une fonction "selectUser" qui va recuperer dans la bdd : l'id du compte qui vient detre créé //
         // Et le if d'en dessous verifie si l'email est deja utilisé //
-        $selectUser = $bdd->prepare("SELECT id FROM users WHERE lastName = ? AND firstName = ? AND email = ?");
+        $selectUser = $bdd->prepare("SELECT id FROM users WHERE lastName = ? AND firstName = ? AND email = ?;");
         $selectUser->execute(array($lastName, $firstName, $email));
         if ($selectUser->rowCount() > 0) {
             echo "Adresse email déjà utilisée.";
             exit();
         }
+
+        $verifyLink = "http://localhost:8888/Projets-fullstack/backend/verify_email.php?token=" . urlencode($token);
+
+        $subject = "Vérification de votre adresse email";
+        $message = "Clique sur ce lien pour vérifier ton compte : " . $verifyLink;
+        $headers = "From: jallier@guardiaschool.fr\r\n";
+        mail($email, $subject, $message, $headers);
 
         // On attrivut les données dans des variables de session //
         $_SESSION['id'] = $selectUser->fetch();['id']; 
@@ -33,8 +41,8 @@ if (isset($_POST['envoie'])) {
 
 
         //On insere les données dans la bdd //
-        $insertUser = $bdd->prepare("INSERT INTO users (lastName, firstName, email, password) VALUES (?, ?, ?, ?)");
-        $insertUser->execute(array($lastName, $firstName, $email, $password));
+        $insertUser = $bdd->prepare("INSERT INTO users (lastName, firstName, email, password, is_verified, token) VALUES (?, ?, ?, ?, ?, ?);");
+        $insertUser->execute(array($lastName, $firstName, $email, $password, 0, $token));
 
         header("Location: login.php");
 

@@ -25,6 +25,10 @@ if(!empty($_POST['email']) AND !empty($_POST['password'])) {
     if ($selectUser->rowCount() > 0) {
         $user = $selectUser->fetch();
 
+        if ((int)$user['is_verified'] !== 1) {
+        $errorMsg = "Veuillez vérifier votre email avant de vous connecter.";
+        }
+
         // On verifie le mot de passe -> en gros le mdp dans la bdd est hashé avec une randomseed donc même si on a le meme mdp, on ne pourra pas le lire donc on use password_verify //
         if (password_verify($password, $user['password'])) {
             // On attrivut les données dans des variables de session //

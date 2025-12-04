@@ -20,6 +20,18 @@ $projets->execute([
 ]);
 $projet = $projets->fetch(PDO::FETCH_ASSOC);
 
+
+$chatSql = "SELECT m.id, m.content, m.created_at, u.firstName, u.lastName
+            FROM messages m
+            JOIN users u ON u.id = m.user_id
+            WHERE m.projets_id = :projet_id
+            ORDER BY m.created_at ASC";
+$chatStmt = $bdd->prepare($chatSql);
+$chatStmt->execute([':projet_id' => $projectId]);
+$allMessages = $chatStmt->fetchAll(PDO::FETCH_ASSOC);
+$chatMessages = array_slice($allMessages, -5);
+
+
 // Construire les événements de la chronologie (début + fin pour l'instant)
 $events = [];
 
@@ -78,6 +90,11 @@ $owner = $users->fetch(PDO::FETCH_ASSOC);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+
+ /////////////////////////////////////////////////////////////////
+ ////////////////////  GESTION DES MEMBRES.  /////////////////////
+ /////////////////////////////////////////////////////////////////
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_member'])) {
 
     $email        = trim($_POST['member_email'] ?? '');
@@ -129,8 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_member'])) {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-
     // On redirige pour éviter le repost du formulaire
     header('Location: dashboard.php?id=' . $projectId);
     exit;
@@ -177,6 +192,35 @@ $currentPerm = $permStmt->fetch(PDO::FETCH_ASSOC);
 // Seuls les users avec permission id 1 ou 2 peuvent gérer les tâches
 $canManageTasks = $currentPerm && in_array((int)$currentPerm['perm_id'], [3, 2], true);
 
+        /////////////////////////////////////////////////////////////////
+        ////////////////////  GESTION DES MESSAGES.  ////////////////////
+        /////////////////////////////////////////////////////////////////
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_message'])) {
+
+    $content = trim($_POST['message_content'] ?? '');
+    if ($content === '') {
+        header('Location: dashboard.php?id=' . $projectId . '#notes');
+        exit;
+    }
+
+    $sql = "INSERT INTO messages (projets_id, user_id, content)
+            VALUES (:projets_id, :user_id, :content)";
+    $stmt = $bdd->prepare($sql);
+    $stmt->execute([
+        ':projets_id' => $projectId,
+        ':user_id'    => $_SESSION['id'],
+        ':content'    => $content
+    ]);
+
+    header('Location: dashboard.php?id=' . $projectId . '#notes');
+    exit;
+}
+
+
+        /////////////////////////////////////////////////////////////////
+        ////////////////////  GESTION DES TACHES.  //////////////////////
+        /////////////////////////////////////////////////////////////////
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_task'])) {
 
@@ -380,7 +424,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                 </div>
             </div>
             <div class="header-actions">
-                <a class="btn btn-primary" id="editProjectLink" href="creationproj.php">Modifier ce projet</a>
                 <a class="btn btn-ghost" href="projets.php">← Retour aux projets</a>
             </div>
         </section>
@@ -559,7 +602,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
 
 
             <!-- DRIVE -->
-
             <article class="panel" data-panel="drive" hidden>
                 <div class="panel-header">
                     <h2>Drive & ressources</h2>
@@ -579,17 +621,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
             <article class="panel" data-panel="notes" hidden>
                 <div class="panel-header">
                     <h2>Notes & chat</h2>
-                    <p class="panel-subtitle">Synthèse des derniers échanges</p>
+                    <p class="panel-subtitle">Échanges en direct sur ce projet</p>
                 </div>
+
                 <div class="notes-box">
-                    <div class="chat-thread" id="chatThread"></div>
-                    <form class="chat-form" id="chatForm">
-                        <textarea id="chatInput" placeholder="Écrire un message..." required></textarea>
+                    <div id="chatThread">
+                        <?php if (!$chatMessages): ?>
+                            <p class="chat-empty">Aucun message pour l’instant. Commence la discussion.</p>
+                        <?php else: ?>
+                            <?php foreach ($chatMessages as $msg): ?>
+                                <div class="chat-message" data-id="<?= (int)$msg['id'] ?>">
+                                    <header>
+                                        <span><?= htmlspecialchars($msg['firstName'].' '.$msg['lastName']) ?></span>
+                                        <span><?= htmlspecialchars($msg['created_at']) ?></span>
+                                    </header>
+                                    <p><?= nl2br(htmlspecialchars($msg['content'])) ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <form class="chat-form" method="POST">
+                        <input type="hidden" name="add_message" value="1">
+                        <textarea name="message_content" placeholder="Écrire un message..." required></textarea>
                         <button type="submit">Envoyer</button>
                     </form>
-                    <small class="muted">Les messages sont enregistrés dans votre navigateur.</small>
                 </div>
             </article>
+
         </section>
 
     </main>
@@ -625,7 +684,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
     const initial = fromHash || (activeBtn && activeBtn.dataset.panelTarget) || (navButtons[0] && navButtons[0].dataset.panelTarget);
     if (initial) showPanel(initial);
 })();
+
+    (function() {
+    const thread = document.getElementById('chatThread');
+    if (!thread) return;
+
+    let lastId = 0;
+    const projectId = <?= (int)$projectId ?>;
+
+    function fetchMessages() {
+        fetch('../../backend/chat_fetch.php?projet_id=' + projectId + '&since_id=' + lastId)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.messages) return;
+            data.messages.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = 'chat-message';
+            div.innerHTML = `
+                <header>
+                <span>${msg.firstName} ${msg.lastName}</span>
+                <span>${msg.created_at}</span>
+                </header>
+                <p>${msg.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+            `;
+            thread.appendChild(div);
+            lastId = Math.max(lastId, parseInt(msg.id, 10));
+            });
+            if (data.messages.length) {
+            thread.scrollTop = thread.scrollHeight;
+            }
+        })
+        .catch(() => {});
+    }
+
+    // Initialisation : récupérer l'id du dernier message déjà rendu en PHP
+    const lastMessage = thread.querySelector('.chat-message:last-child');
+    if (lastMessage && lastMessage.dataset && lastMessage.dataset.id) {
+        lastId = parseInt(lastMessage.dataset.id, 10) || 0;
+    }
+
+    setInterval(fetchMessages, 3000);
+    })();
+
+    const lastMessage = thread.querySelector('.chat-message:last-child');
+    if (lastMessage && lastMessage.dataset && lastMessage.dataset.id) {
+    lastId = parseInt(lastMessage.dataset.id, 10) || 0;
+    thread.scrollTop = thread.scrollHeight; // forcer le scroll bas au load
+}
+
 </script>
+
+
 
 </body>
 </html>

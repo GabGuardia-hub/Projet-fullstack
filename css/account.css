@@ -208,7 +208,7 @@ body {
 }
 
 .nav-link.logout {
-    color: var(--color-danger-fg);
+    color: var(--color-attention-subtle);
 }
 
 .nav-link.active .nav-icon {

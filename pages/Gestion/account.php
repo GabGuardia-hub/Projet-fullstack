@@ -67,15 +67,6 @@ require_once'../../backend/env.php';    if (isset($_POST['valider'])) {
                     <h3 class="nav-section-title">Compte</h3>
                     <ul class="nav-list">
                         <li class="nav-item">
-                            <a href="#profile" class="nav-link" onclick="showSection('profile')">
-                                <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                                Profil public
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="#account" class="nav-link active" onclick="showSection('account')">
                                 <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <circle cx="12" cy="12" r="3"/>
@@ -145,49 +136,6 @@ require_once'../../backend/env.php';    if (isset($_POST['valider'])) {
 
         <!-- Main Content Area -->
         <main class="settings-main">
-            <!-- Profile Section -->
-            <section id="profile" class="content-section" style="display: none;">
-                <div class="content-header">
-                    <h1>Profil public</h1>
-                    <p class="content-description">Les informations suivantes peuvent être visibles par tous les utilisateurs.</p>
-                </div>
-
-                <div class="settings-group">
-                    <div class="form-group">
-                        <label class="form-label">Photo de profil</label>
-                        <div class="avatar-upload-container">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect fill='%236e40c9' width='80' height='80' rx='40'/%3E%3Ctext x='50%25' y='50%25' font-size='32' fill='white' text-anchor='middle' dy='.3em'%3EU%3C/text%3E%3C/svg%3E" alt="Avatar" id="profileAvatar" class="avatar-preview">
-                            <div class="avatar-actions">
-                                <button class="btn-secondary btn-sm" onclick="document.getElementById('avatarUpload').click()">
-                                    Changer
-                                </button>
-                                <input type="file" id="avatarUpload" accept="image/*" hidden>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="username">Nom d'utilisateur</label>
-                        <input type="text" id="username" class="form-input" value="utilisateur" placeholder="Votre nom d'utilisateur">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="bio">Bio</label>
-                        <textarea id="bio" class="form-textarea" rows="4" placeholder="Parlez-nous de vous..."></textarea>
-                        <small class="form-hint">Une brève description de vous-même</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="website">Site web</label>
-                        <input type="url" id="website" class="form-input" placeholder="https://example.com">
-                    </div>
-
-                    <div class="form-actions">
-                        <button class="btn-primary" onclick="saveProfile()">Mettre à jour le profil</button>
-                    </div>
-                </div>
-            </section>
-
             <!-- Message d'erreur -->
                 <?php if (!empty($errorMsg)): ?>
                     <div class="error-message">

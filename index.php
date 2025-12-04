@@ -12,121 +12,6 @@ session_start();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Styles pour le carrousel */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        main {
-            flex: 1;
-            padding-bottom: 40px; /* Réduction de l'espace en bas */
-            position: relative;
-        }
-
-        .trust-section {
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin: 80px -50vw 0 -50vw;
-            background: var(--bg);
-            padding: 40px 0;
-            overflow: hidden;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #111827;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            color: #6b7280;
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
-        }
-
-        .logo-carousel {
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            padding: 0;
-            overflow: visible;
-            white-space: nowrap;
-        }
-
-        .logo-track {
-            display: inline-block;
-            white-space: nowrap;
-            animation: scroll 30s linear infinite;
-            padding: 30px 0;
-            min-width: 100%;
-        }
-
-        .logo-item {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 50px;
-            vertical-align: middle;
-            transition: all 0.3s ease;
-            height: 150px;
-        }
-
-        .logo-item img {
-            height: 150px;
-            width: auto;
-            max-width: 350px;
-            opacity: 0.9;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
-
-        .logo-item:hover img {
-            opacity: 1;
-            transform: scale(1.1);
-            filter: brightness(1.1);
-        }
-        
-        .logo-item:hover {
-            transform: scale(1.1);
-        }
-
-        @keyframes scroll {
-            0% { 
-                transform: translateX(0);
-            }
-            100% { 
-                transform: translateX(-50%);
-            }
-        }
-        
-
-        @media (max-width: 1024px) {
-            .logo-item {
-                height: 50px;
-            }
-            .logo-item img {
-                height: 70px;
-                max-width: 180px;
-            }
-        }
-        
-        /* Le style pour les flèches du sélecteur de workflow a été déplacé dans style.css */
-    </style>
 </head>
 <body>
     <header>
@@ -289,8 +174,11 @@ session_start();
             operations: {
                 description: "Harmonisez vos processus opérations, finances et logistique dans un tableau unique.",
                 image: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80"
-            }
-        };
+            },
+
+        
+        
+        
 
         const workflowImage = document.getElementById('workflowImage');
         const workflowDescription = document.getElementById('workflowDescription');

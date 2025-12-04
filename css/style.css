@@ -255,6 +255,62 @@ main {
     box-shadow: 0 20px 50px rgba(79, 70, 229, 0.25);
 }
 
+.workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.workflow-option {
+    padding: 20px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background: white;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.workflow-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: rgba(98, 70, 234, 0.3);
+}
+
+.workflow-option.active {
+    border: 2px solid #6246ea;
+    background-color: #f8f7ff;
+}
+
+.workflow-option svg {
+    width: 24px;
+    height: 24px;
+    color: #6246ea;
+}
+
+.workflow-option.active svg {
+    color: #6246ea;
+}
+
+.workflow-option span {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.workflow-option.active span {
+    color: #6246ea;
+    font-weight: 600;
+}
+
 /* Styles pour la page de compte */
 .settings-container {
     display: flex;
@@ -396,6 +452,10 @@ main {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .workflow-grid {
+        grid-template-columns: 1fr;
+    }
+    
     .settings-container {
         flex-direction: column;
     }

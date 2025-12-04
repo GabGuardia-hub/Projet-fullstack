@@ -86,8 +86,6 @@ echo '<a id="top"></a>';
             </svg>
         </button>
     </header>
-        </svg>
-    </button>
 
     <div class="settings-container">
         <!-- Sidebar Navigation -->
@@ -442,5 +440,36 @@ echo '<a id="top"></a>';
     </div>
 
     <script src="../../js/script.js"></script>
+    <script>
+        // Initialisation de la navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Afficher la section active au chargement
+            const hash = window.location.hash.replace('#', '') || 'account';
+            showSection(hash);
+            
+            // Gérer les clics sur les liens de navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('href').replace('#', '');
+                    showSection(sectionId);
+                    window.location.hash = sectionId;
+                });
+            });
+        });
+        
+        function showSection(sectionId) {
+            // Masquer toutes les sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Afficher la section sélectionnée
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>

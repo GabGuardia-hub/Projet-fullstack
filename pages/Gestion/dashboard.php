@@ -97,13 +97,16 @@ $owner = $users->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_member'])) {
 
+    if (!$canManageMembers) {
+        die('Vous n’êtes pas autorisé à ajouter des membres à ce projet.');
+    }
+
     $email        = trim($_POST['member_email'] ?? '');
     $roleName     = trim($_POST['role_name'] ?? '');
     $permissionId = (int)($_POST['permission_id'] ?? 0);
 
     if ($email !== '' && $roleName !== '' && $permissionId > 0) {
 
-        // 1) Trouver l'utilisateur par email
         $sql = "SELECT id FROM users WHERE email = :email";
         $stmt = $bdd->prepare($sql);
         $stmt->execute([':email' => $email]);
@@ -112,7 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_member'])) {
         if ($user) {
             $userId = (int)$user['id'];
 
-            // On créer (ou récupère) le rôle avec la permission donnée
             $Rolesql = "SELECT id FROM role WHERE name = :name AND perimission_id = :perm_id";
             $Rolestmt = $bdd->prepare($Rolesql);
             $Rolestmt->execute([
@@ -134,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_member'])) {
                 $roleId = (int)$bdd->lastInsertId();
             }
 
-            // 3) Insérer dans membre_projets
+            
             $membreProjetsql = "INSERT INTO membre_projets (projets_id, user_id, role_id, joined_at)
                     VALUES (:projets_id, :user_id, :role_id, CURDATE())";
             $MembreProjetsstmt = $bdd->prepare($membreProjetsql);
@@ -189,8 +191,13 @@ $permStmt->execute([
 ]);
 $currentPerm = $permStmt->fetch(PDO::FETCH_ASSOC);
 
-// Seuls les users avec permission id 1 ou 2 peuvent gérer les tâches
+
+        /////////////////////////////////////////////////////////////////
+        ///////////////////  GESTION DES PERMISSIONS.  //////////////////
+        /////////////////////////////////////////////////////////////////
 $canManageTasks = $currentPerm && in_array((int)$currentPerm['perm_id'], [3, 2], true);
+$canManageMembers = $currentPerm && (int)$currentPerm['perm_id'] === 3;
+$canManageTimeline = $currentPerm && in_array((int)$currentPerm['perm_id'], [2, 3], true);
 
         /////////////////////////////////////////////////////////////////
         ////////////////////  GESTION DES MESSAGES.  ////////////////////
@@ -471,6 +478,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                     <?php endif; ?>
                 </ul>
 
+                <?php if ($canManageMembers): ?>
                 <form class="inline-form" method="POST" action="" style="margin-top: 20px;">
                     <input type="hidden" name="add_member" value="1">
                     <input type="hidden" name="projet_id" value="<?= (int)$projectId ?>">
@@ -489,6 +497,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
 
                     <button type="submit">Ajouter un membre</button>
                 </form>
+            <?php else: ?>
+                <p class="muted" style="margin-top: 12px;">
+                    
+                </p>
+            <?php endif; ?>
+
             </article>
 
             <!-- TASKS -->
@@ -564,9 +578,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                         <button type="submit">Ajouter une tâche</button>
                     </form>
                 <?php else: ?>
-                    <p class="muted" style="margin-top:12px;">
-                        Seuls les membres avec la permission 1 ou 2 peuvent créer des tâches.
-                    </p>
+                    <p class="muted" style="margin-top:12px;"></p>
                 <?php endif; ?>
             </article>
 
@@ -597,6 +609,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                         </div>
                     </div>
                 <?php endif; ?>
+
+                <?php if ($canManageTimeline): ?>
+                <form class="inline-form" method="POST" style="margin-top: 18px;">
+                    <input type="hidden" name="add_timeline_event" value="1">
+
+                    <input type="text" name="event_label" placeholder="Nom de l’événement (ex: Kickoff client)" required>
+                    <input type="date" name="event_date" required>
+
+                    <button type="submit">Ajouter un événement</button>
+                </form>
+                <?php endif; ?>
+
             </article>
 
 

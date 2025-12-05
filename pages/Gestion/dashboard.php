@@ -6,6 +6,27 @@ if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
 }
 $projectId = (int)$_GET['id'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project_meta'])) {
+
+    $newName   = trim($_POST['project_name'] ?? '');
+    $newStatus = trim($_POST['project_status'] ?? '');
+
+    $allowedStatus = ['En préparation', 'En cours', 'Terminé'];
+    if ($newName !== '' && in_array($newStatus, $allowedStatus, true)) {
+        $sql = "UPDATE projets SET name = :name, status = :status WHERE id = :id";
+        $stmt = $bdd->prepare($sql);
+        $stmt->execute([
+            ':name'   => $newName,
+            ':status' => $newStatus,
+            ':id'     => $projectId
+        ]);
+    }
+
+    header('Location: dashboard.php?id=' . $projectId);
+    exit;
+}
+
+
 $sprojetsql = "
     SELECT p.*
     FROM projets p
@@ -32,7 +53,6 @@ $allMessages = $chatStmt->fetchAll(PDO::FETCH_ASSOC);
 $chatMessages = array_slice($allMessages, -5);
 
 
-// Construire les événements de la chronologie (début + fin pour l'instant)
 $events = [];
 
 // Début du projet
@@ -48,6 +68,22 @@ if (!empty($projet['fin_prevue'])) {
     $events[] = [
         'label'      => 'Fin prévue',
         'event_date' => $projet['fin_prevue'],
+    ];
+}
+
+// Événements personnalisés depuis la table timeline
+$timelineSql = "SELECT label, event_date 
+                FROM timeline 
+                WHERE projets_id = :projet_id
+                ORDER BY event_date ASC";
+$timelineStmt = $bdd->prepare($timelineSql);
+$timelineStmt->execute([':projet_id' => $projectId]);
+$dbEvents = $timelineStmt->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($dbEvents as $e) {
+    $events[] = [
+        'label'      => $e['label'],
+        'event_date' => $e['event_date'],
     ];
 }
 
@@ -80,6 +116,51 @@ $tasks = $taskStmt->fetchAll(PDO::FETCH_ASSOC);
 if (!$projet) {
     die('Projet introuvable ou non autorisé.');
 }
+
+// === CHARGER LES MEMBRES EXISTANTS ===
+$Equipesql = "SELECT u.id, u.firstName, u.lastName, u.email,
+                     r.name AS role_name, p.name AS perm_name
+        FROM membre_projets mp
+        JOIN users u      ON u.id = mp.user_id
+        JOIN role r       ON r.id = mp.role_id
+        JOIN permissions p ON p.id = r.perimission_id
+        WHERE mp.projets_id = :projet_id
+        ORDER BY r.name, u.lastName";
+$equipe = $bdd->prepare($Equipesql);
+$equipe->execute([':projet_id' => $projectId]);
+$membres = $equipe->fetchAll(PDO::FETCH_ASSOC);
+
+// === CHARGER LES PERMISSIONS POUR LE SELECT ===
+$Permissionsql = "SELECT id, name, description FROM permissions ORDER BY id";
+$permStmt = $bdd->query($Permissionsql);
+$permissions = $permStmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+if (!$projet) {
+    die('Projet introuvable ou non autorisé.');
+}
+
+// Récupérer la permission de l'utilisateur sur ce projet
+$permSql = "SELECT p.id AS perm_id, p.name AS perm_name
+            FROM membre_projets mp
+            JOIN role r        ON r.id = mp.role_id
+            JOIN permissions p ON p.id = r.perimission_id
+            WHERE mp.projets_id = :projet_id
+              AND mp.user_id   = :user_id
+            LIMIT 1";
+$permStmt = $bdd->prepare($permSql);
+$permStmt->execute([
+    ':projet_id' => $projectId,
+    ':user_id'   => $_SESSION['id']
+]);
+$currentPerm = $permStmt->fetch(PDO::FETCH_ASSOC);
+
+        /////////////////////////////////////////////////////////////////
+        ///////////////////  GESTION DES PERMISSIONS.  //////////////////
+        /////////////////////////////////////////////////////////////////
+$canManageTasks = $currentPerm && in_array((int)$currentPerm['perm_id'], [3, 2], true);
+$canManageMembers = $currentPerm && (int)$currentPerm['perm_id'] === 3;
+$canManageTimeline = $currentPerm && in_array((int)$currentPerm['perm_id'], [2, 3], true);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -153,51 +234,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_member'])) {
     exit;
 }
 
-// === CHARGER LES MEMBRES EXISTANTS ===
-$Equipesql = "SELECT u.id, u.firstName, u.lastName, u.email,
-                     r.name AS role_name, p.name AS perm_name
-        FROM membre_projets mp
-        JOIN users u      ON u.id = mp.user_id
-        JOIN role r       ON r.id = mp.role_id
-        JOIN permissions p ON p.id = r.perimission_id
-        WHERE mp.projets_id = :projet_id
-        ORDER BY r.name, u.lastName";
-$equipe = $bdd->prepare($Equipesql);
-$equipe->execute([':projet_id' => $projectId]);
-$membres = $equipe->fetchAll(PDO::FETCH_ASSOC);
-
-// === CHARGER LES PERMISSIONS POUR LE SELECT ===
-$Permissionsql = "SELECT id, name, description FROM permissions ORDER BY id";
-$permStmt = $bdd->query($Permissionsql);
-$permissions = $permStmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-if (!$projet) {
-    die('Projet introuvable ou non autorisé.');
-}
-
-// Récupérer la permission de l'utilisateur sur ce projet
-$permSql = "SELECT p.id AS perm_id, p.name AS perm_name
-            FROM membre_projets mp
-            JOIN role r        ON r.id = mp.role_id
-            JOIN permissions p ON p.id = r.perimission_id
-            WHERE mp.projets_id = :projet_id
-              AND mp.user_id   = :user_id
-            LIMIT 1";
-$permStmt = $bdd->prepare($permSql);
-$permStmt->execute([
-    ':projet_id' => $projectId,
-    ':user_id'   => $_SESSION['id']
-]);
-$currentPerm = $permStmt->fetch(PDO::FETCH_ASSOC);
-
-
-        /////////////////////////////////////////////////////////////////
-        ///////////////////  GESTION DES PERMISSIONS.  //////////////////
-        /////////////////////////////////////////////////////////////////
-$canManageTasks = $currentPerm && in_array((int)$currentPerm['perm_id'], [3, 2], true);
-$canManageMembers = $currentPerm && (int)$currentPerm['perm_id'] === 3;
-$canManageTimeline = $currentPerm && in_array((int)$currentPerm['perm_id'], [2, 3], true);
 
         /////////////////////////////////////////////////////////////////
         ////////////////////  GESTION DES MESSAGES.  ////////////////////
@@ -320,6 +356,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
     exit;
 }
 
+
+// GESTION DES TIMELINE. 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_timeline_event'])) {
+
+    if (!$canManageTimeline) {
+        die('Vous n’êtes pas autorisé à ajouter des événements à cette chronologie.');
+    }
+
+    $label = trim($_POST['event_label'] ?? '');
+    $date  = trim($_POST['event_date'] ?? '');
+
+    if ($label === '' || $date === '') {
+        die('Nom et date des événements sont obligatoires.');
+    }
+
+    $sql = "INSERT INTO timeline (projets_id, label, event_date)
+            VALUES (:projet_id, :label, :event_date)";
+    $stmt = $bdd->prepare($sql);
+    $ok = $stmt->execute([
+        ':projet_id' => $projectId,
+        ':label'     => $label,
+        ':event_date'=> $date
+    ]);
+
+    if (!$ok) {
+        var_dump($stmt->errorInfo());
+        exit;
+    }
+
+    header('Location: dashboard.php?id=' . $projectId . '#timeline');
+    exit;
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -331,10 +401,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
     <link rel="stylesheet" href="../../css/projet-dashboard.css">
     
 </head>
+
 <body class="promanage-body">
 
-<?php include '../nav/nav.php'; ?>
-
+<header><?php include '../nav/nav.php'; ?></header>
 <div class="promanage-dashboard">
     <aside class="dashboard-sidebar">
         <div class="sidebar-header">
@@ -402,38 +472,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
     <main class="dashboard-main">
 
         <section class="main-header card" id="dashboardContent">
-            <div>
-                <p class="eyebrow">Dashboard du projet : <?php echo htmlspecialchars($projet['name']); ?></p>
-                <h1 id="projectTitle"></h1>
-                <p class="projects-subtitle" id="projectDescription"></p>
-            </div>
-            <span class="status-pill" id="projectStatusPill" data-status="<?php echo $projet['status']; ?>">
-                <?php echo htmlspecialchars($projet['status']); ?>
-            </span>
-            <div class="header-meta">
-                <div>
-                    <strong>Responsable</strong>
-                    <p id="projectOwner">
-                        <?php echo htmlspecialchars($owner['lastName'].' '.$owner['firstName']); ?>
-                    </p>
+            <div class="header-top">
+                <div class="header-left">
+                    <p class="eyebrow">
+                        Dashboard du projet : <?= htmlspecialchars($projet['name']) ?>
+                        </p>
+
+                        <form method="POST" class="project-meta-form" id="projectMetaForm">
+                            <input type="hidden" name="update_project_meta" value="1">
+
+                            <input
+                                type="text"
+                                name="project_name"
+                                class="project-name-input"
+                                value="<?= htmlspecialchars($projet['name']) ?>"
+                                maxlength="80">
+
+                            <select name="project_status" id="projectStatusSelect" hidden>
+                                <option value="En préparation" <?= $projet['status']==='En préparation'?'selected':''; ?>>En préparation</option>
+                                <option value="En cours"       <?= $projet['status']==='En cours'?'selected':''; ?>>En cours</option>
+                                <option value="Terminé"        <?= $projet['status']==='Terminé'?'selected':''; ?>>Terminé</option>
+                            </select>
+
+                            <button type="submit" class="btn btn-ghost">
+                                Mettre à jour
+                            </button>
+                        </form>
+
+
+                        <span class="status-pill" id="statusPill" data-status="<?= htmlspecialchars($projet['status']) ?>">
+                            <?= htmlspecialchars($projet['status']) ?>
+                        </span>
+
                 </div>
-                <div>
-                    <strong>Début</strong>
-                    <p id="projectStart">
-                        <?php echo htmlspecialchars($projet['created_at']); ?>
-                    </p>
-                </div>
-                <div>
-                    <strong>Fin prévue</strong>
-                    <p id="projectEnd">
-                        <?php echo htmlspecialchars($projet['fin_prevue']); ?>
-                    </p>
-                </div>
             </div>
-            <div class="header-actions">
-                <a class="btn btn-ghost" href="projets.php">← Retour aux projets</a>
-            </div>
-        </section>
+
+                <div class="header-meta">
+                    <div>
+                        <strong>Responsable</strong>
+                        <p id="projectOwner">
+                            <?= htmlspecialchars($owner['lastName'].' '.$owner['firstName']) ?>
+                        </p>
+                    </div>
+                    <div>
+                        <strong>Début</strong>
+                        <p id="projectStart">
+                            <?= htmlspecialchars($projet['created_at']) ?>
+                        </p>
+                    </div>
+                    <div>
+                        <strong>Fin prévue</strong>
+                        <p id="projectEnd">
+                            <?= htmlspecialchars($projet['fin_prevue']); ?>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <a class="btn btn-ghost" href="projets.php">← Retour aux projets</a>
+                </div>
+            </section>
+
+       
             <!-- OVERVIEW -->
             <article class="panel" data-panel="overview" >
                 <div class="panel-header">
@@ -575,7 +675,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                         <?php endforeach; ?>
             </select>
 
-                        <button type="submit">Ajouter une tâche</button>
+                        <button type="submit" class="task-add-btn">Ajouter une tâche</button>
+
+
                     </form>
                 <?php else: ?>
                     <p class="muted" style="margin-top:12px;"></p>
@@ -617,7 +719,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
                     <input type="text" name="event_label" placeholder="Nom de l’événement (ex: Kickoff client)" required>
                     <input type="date" name="event_date" required>
 
-                    <button type="submit">Ajouter un événement</button>
+                    <button type="submit" class="task-add-btn">Ajouter un evenement</button>
+
                 </form>
                 <?php endif; ?>
 
@@ -680,6 +783,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
 
 
 <script>
+    (function () {
+    const pill   = document.getElementById('statusPill');
+    const select = document.getElementById('projectStatusSelect');
+    const form   = document.getElementById('projectMetaForm');
+    if (!pill || !select || !form) return;
+
+    const labels = ['En préparation', 'En cours', 'Terminé'];
+
+    pill.addEventListener('click', () => {
+        const current = pill.dataset.status || select.value;
+        const idx = labels.indexOf(current);
+        const next = labels[(idx + 1) % labels.length];
+
+        // maj bulle
+        pill.dataset.status = next;
+        pill.textContent = next;
+
+        // maj valeur envoyée
+        select.value = next;
+
+        console.log('Envoi statut vers PHP ->', next);
+
+        form.submit(); // envoie POST vers ton bloc update_project_meta
+    });
+})();
+
+
+
+
+
 (function(){
     const navButtons = document.querySelectorAll('[data-panel-target]');
     const panelSections = document.querySelectorAll('[data-panel]');
@@ -750,11 +883,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task_status'])
     setInterval(fetchMessages, 3000);
     })();
 
-    const lastMessage = thread.querySelector('.chat-message:last-child');
-    if (lastMessage && lastMessage.dataset && lastMessage.dataset.id) {
-    lastId = parseInt(lastMessage.dataset.id, 10) || 0;
-    thread.scrollTop = thread.scrollHeight; // forcer le scroll bas au load
-}
 
 </script>
 

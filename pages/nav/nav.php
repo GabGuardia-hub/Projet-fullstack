@@ -5,16 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>nav</title>
     <link rel="stylesheet" href="../../css/style.css">
-    <style>
-        .main-navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-        }
-    </style>
 </head>
-<body>
-    <header class="main-navbar">
+<header class="main-navbar">
         <div class="top-nav">
             <a href="/Projet-fullstack/index.php" class="logo">
                 <span class="guardia" style="color: #6d28d9;">Guardia</span>
@@ -31,6 +23,5 @@
                 <?php endif; ?>
             </div>
         </div>
-    </header>
-</body>
+ </header>
 </html>

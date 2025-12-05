@@ -73,9 +73,16 @@ if(!empty($_POST['email']) AND !empty($_POST['password'])) {
 
               <!-- Message d'erreur -->
                 <?php if (!empty($errorMsg)): ?>
-                    <div class="error-message">
-                        <?= htmlspecialchars($errorMsg) ?>
+                <div class="settings-group danger-zone">
+                    <div class="danger-item">
+                        <div class="danger-info">
+                            
+                                <div class="error-message">
+                            <?= htmlspecialchars($errorMsg) ?>
+                                 </div>     
+                        </div>
                     </div>
+                </div>
                 <?php endif; ?>
 
 

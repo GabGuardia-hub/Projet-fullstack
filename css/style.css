@@ -8,6 +8,9 @@
     --text: #1f1f24;
     --muted: #6b6b7c;
     --card-radius: 28px;
+    --color-danger-fg: #d1242f;
+    --color-danger-emphasis: #cf222e;
+    --color-danger-subtle: #ffebe9;
 }
 
 * {
@@ -22,11 +25,15 @@ body {
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
-    padding-top: 80px; /* Ajout d'un padding en haut pour éviter que le contenu ne soit caché sous la navbar */
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 8px 0 0 0;  /* padding-top 80px, 0 sur les côtés et en bas */
 }
 
+
 header {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
@@ -385,13 +392,15 @@ main {
 .settings-container {
     display: flex;
     min-height: calc(100vh - 80px);
-    max-width: 1200px;
+    width: 80%;          /* ou 100% si tu veux toute la largeur */
+    max-width: 1400px;   /* optionnel : ou supprime cette ligne */
     margin: 0 auto;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     overflow: hidden;
 }
+
 
 .settings-sidebar {
     width: 280px;
@@ -504,13 +513,6 @@ main {
     color: #1f1f24;
 }
         /* Styles pour le carrousel */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
 
         main {
             flex: 1;
@@ -671,3 +673,41 @@ main {
         padding: 24px;
     }
 }
+.settings-group {
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: var(--color-canvas-subtle);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+}
+
+    /* ============= DANGER ZONE ============= */
+    .danger-zone {
+        background-color: var(--color-danger-subtle);
+        border: 2px solid var(--color-danger-emphasis);
+    }
+
+    .danger-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .danger-info h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: var(--color-danger-fg);
+    }
+
+    .danger-info p {
+        font-size: 12px;
+        color: var(--color-fg-muted);
+    }
+    .danger-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+

@@ -73,12 +73,17 @@ if (isset($_POST['envoie'])) {
             <h1 class="title">Créer un compte</h1>
         </div>
 
-        <!-- Message d'erreur -->
-        <?php if (!empty($errorMsg)): ?>
-            <div class="error-message">
-                <?= htmlspecialchars($errorMsg) ?>
-            </div>
-        <?php endif; ?>
+            <?php if (!empty($errorMsg)): ?>
+                <div class="settings-group danger-zone">
+                    <div class="danger-item">
+                        <div class="danger-info">               
+                                <div class="error-message">
+                            <?= htmlspecialchars($errorMsg) ?>
+                                 </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
 
         <form action="#" method="POST">

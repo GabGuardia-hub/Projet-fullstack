@@ -85,37 +85,9 @@ body {
     color: var(--color-fg-default);
     background-color: var(--color-canvas-default);
     transition: background-color 0.2s, color 0.2s;
+    padding-top: 800px
 }
 
-/* ============= THEME TOGGLE BUTTON ============= */
-.theme-toggle-btn {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 100;
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    background-color: var(--color-canvas-subtle);
-    border: 1px solid var(--color-border-default);
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.theme-toggle-btn:hover {
-    background-color: var(--color-neutral-muted);
-    border-color: var(--color-fg-muted);
-}
-
-.theme-icon {
-    position: absolute;
-    stroke: var(--color-fg-default);
-    transition: all 0.2s;
-}
 
 .sun-icon {
     opacity: 1;
@@ -127,22 +99,17 @@ body {
     transform: rotate(90deg) scale(0.5);
 }
 
-[data-theme="dark"] .sun-icon {
-    opacity: 0;
-    transform: rotate(-90deg) scale(0.5);
-}
-
-[data-theme="dark"] .moon-icon {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-}
-
 /* ============= SETTINGS CONTAINER ============= */
 .settings-container {
     display: flex;
-    min-height: 100vh;
-    max-width: 1280px;
-    margin: 0 auto;
+    min-height: calc(100vh - 80px);
+    width: 90%;          /* largeur en % */
+    max-width: 1400px;   /* optionnel : limite max sur grands écrans */
+    margin: 0 auto;      /* reste centrée */
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
 /* ============= SIDEBAR ============= */

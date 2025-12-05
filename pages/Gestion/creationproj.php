@@ -40,7 +40,7 @@ if (isset($_POST['envoie'])) {
         $projetId = (int)$bdd->lastInsertId();
 
         
-        $roleName       = 'Owner';
+        $roleName       = 'Administrateur';
         $defaultPermId  = 3; 
 
         // Chercher un rôle "Owner" avec cette permission
@@ -84,12 +84,14 @@ if (isset($_POST['envoie'])) {
         $timelineStmt = $bdd->prepare($timelineSql);
         $timelineStmt->execute([':projet_id' => $projectId]);
         $events = $timelineStmt->fetchAll(PDO::FETCH_ASSOC);
+        
 
          }
-    } 
+     
     } else {
         $errorMsg = "Tous les champs doivent être complétés !";
-    }
+        }
+    }   
 ?>
 
 <!DOCTYPE html>
@@ -101,12 +103,11 @@ if (isset($_POST['envoie'])) {
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/projet.css">
 </head>
+
+<header><?php include '../nav/nav.php'; ?></header>
 <body>
-
-    <?php include '../nav/nav.php'; ?>
-
     <main class="project-builder">
-        <header class="builder-header panel">
+        <div class="builder-header panel">
             <div>
                 <p class="eyebrow">Assistant projet</p>
                 <h1 id="builderTitle">Creation Projet</h1>
@@ -116,18 +117,25 @@ if (isset($_POST['envoie'])) {
             <div class="builder-actions">
                 <a class="btn btn-light" href="projets.php">← Retour à la liste</a>
             </div>
-        </header>
+        </div>
 
         <form class="builder-form" id="projectBuilderForm" method="POST" autocomplete="off" >
             <section class="panel">
                 <div class="panel-header">
                     <div>
-                        <!--Message erreur-->
-        <?php if (!empty($errorMsg)): ?>
-            <div class="error-message">
-                <?= htmlspecialchars($errorMsg) ?>
-            </div>
-        <?php endif; ?>
+
+            <?php if (!empty($errorMsg)): ?>
+                <div class="settings-group danger-zone">
+                    <div class="danger-item">
+                        <div class="danger-info">               
+                                <div class="error-message">
+                            <?= htmlspecialchars($errorMsg) ?>
+                                 </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                         <h2>Informations générales</h2>
 
                         <p class="panel-subtitle">Nom, responsable, dates et statut.</p>
@@ -159,28 +167,11 @@ if (isset($_POST['envoie'])) {
                         <textarea id="projectDescription" name="projectDescription" placeholder="Objectifs, périmètre et attentes."></textarea>
                     </div>
                 </div>
+                <br>
+                
             </section>
 
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Tâches</h2>
-                        <p class="panel-subtitle">Listez les actions clés et leurs dates limites.</p>
-                    </div>
-                    <button type="button" class="icon-button" id="addTaskRow">+ Ajouter</button>
-                </div>
-                <div class="dynamic-section" id="taskRows"></div>
-            </section>
 
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Notes & chat</h2>
-                        <p class="panel-subtitle">Gardez une trace des décisions importantes.</p>
-                    </div>
-                </div>
-                <textarea id="chatNotes" placeholder="Décisions, risques, points à trancher..."></textarea>
-            </section>
 
             <div class="form-actions">
                 <input type="submit" name = "envoie" value="Enregistrer" class="btn btn-primary" />

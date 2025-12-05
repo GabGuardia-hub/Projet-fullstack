@@ -11,21 +11,30 @@ if (isset($_POST['valider']) && !empty($_POST['newlastName']) && !empty($_POST['
     $newemail = htmlspecialchars($_POST['newemail']);
     $newphone = htmlspecialchars($_POST['newphone']);
 
-    // Mettre à jour les variables de session
-    $_SESSION['lastName'] = $newlastName;
-    $_SESSION['firstName'] = $newfirstName;
-    $_SESSION['email'] = $newemail;
-    $_SESSION['phone'] = $newphone;
-    
-    $updateUser = $bdd->prepare("UPDATE users SET lastName = ?, firstName = ?, email = ?, phone = ? WHERE id = ?");
-    $updateUser->execute(array($newlastName, $newfirstName, $newemail, $newphone, $_SESSION['id']));
+    try {
+        // Mettre à jour les variables de session
+        $_SESSION['lastName'] = $newlastName;
+        $_SESSION['firstName'] = $newfirstName;
+        $_SESSION['email'] = $newemail;
+        $_SESSION['phone'] = $newphone;
+        
+        
+        $updateUser = $bdd->prepare("UPDATE users SET lastName = ?, firstName = ?, email = ?, phone = ? WHERE id = ?");
+        $updateUser->execute(array($newlastName, $newfirstName, $newemail, $newphone, $_SESSION['id']));
 
-    header("Location: account.php#top");
-    exit();
+        header("Location: account.php#top");
+        exit();
+
+    } catch (PDOException $e) {
+        if ($e->getCode() === '23000') {
+            $errorMsg = "Ce numéro de téléphone est déjà utilisé.";
+        } else {
+            $errorMsg = "Erreur lors de la mise à jour du compte.";
+        }
+    }
 }
 
-// Ajouter une ancre en haut de la page
-echo '<a id="top"></a>';
+
 ?>
 
 
@@ -37,49 +46,11 @@ echo '<a id="top"></a>';
     <title>Mon Compte • GuardiaProjets</title>
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/account.css">
-    <style>
-        /* Réinitialiser le défilement de la page */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            padding-top: 70px; /* Hauteur de la navbar */
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        /* Style spécifique pour la navbar sur la page Mon compte */
-        .main-navbar {
-            background: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .settings-container {
-            min-height: calc(100vh - 70px);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-            display: flex;
-            gap: 30px;
-        }
-        
-        .settings-sidebar {
-            width: 280px;
-            flex-shrink: 0;
-        }
-        
-        .settings-main {
-            flex: 1;
-            background: #fff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-    </style>
 </head>
+
 <body>
-    <?php include '../nav/nav.php'; ?>
+    <header><?php include '../nav/nav.php'; ?></header>
+    
     <div class="settings-container">
         <!-- Sidebar Navigation -->
         <aside class="settings-sidebar">
@@ -112,15 +83,6 @@ echo '<a id="top"></a>';
                 <div class="nav-section">
                     <h3 class="nav-section-title">Accès</h3>
                     <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="#emails" class="nav-link" onclick="showSection('emails')">
-                                <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                    <polyline points="22,6 12,13 2,6"/>
-                                </svg>
-                                Emails
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a href="#security" class="nav-link" onclick="showSection('security')">
                                 <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -157,14 +119,10 @@ echo '<a id="top"></a>';
 
         <!-- Main Content Area -->
         <main class="settings-main">
-            <!-- Message d'erreur -->
-                <?php if (!empty($errorMsg)): ?>
-                    <div class="error-message">
-                        <?= htmlspecialchars($errorMsg) ?>
-                    </div>
-                <?php endif; ?>
 
             <!-- Account Section -->
+
+            
              
             <section id="account" class="content-section active">
                 <div class="content-header">
@@ -193,7 +151,7 @@ echo '<a id="top"></a>';
 
                     <div class="form-group">
                         <label class="form-label" for="phone">Téléphone</label>
-                        <input type="tel" id="phone" name="newphone" class="form-input" value="<?php echo isset($_SESSION['phone']) ? htmlspecialchars($_SESSION['phone']) : '+33 6 00 00 00 00'; ?>">
+                        <input type="tel" id="phone" name="newphone" class="form-input" value="<?php echo isset($_SESSION['phone']) ? htmlspecialchars($_SESSION['phone']) : ''; ?>">
                     </div>
                     
 
@@ -203,13 +161,26 @@ echo '<a id="top"></a>';
                     </div>
                 </div></form>
 
+                <?php if (!empty($errorMsg)): ?>
+                <div class="settings-group danger-zone">
+                    <div class="danger-item">
+                        <div class="danger-info">               
+                                <div class="error-message">
+                            <?= htmlspecialchars($errorMsg) ?>
+                                 </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+                   
+
                 <div class="settings-group danger-zone">
                     <div class="danger-item">
                         <div class="danger-info">
                             <h3>Supprimer ce compte</h3>
                             <p>Une fois supprimé, il n'y a pas de retour en arrière. Veuillez en être certain.</p>
                         </div>
-                        <button class="btn-danger" onclick="deleteAccount()">Supprimer le compte</button>
+                        <button class="btn-danger" onclick="deleteAccount()" disabled>Supprimer le compte</button>
                     </div>
                 </div>
             </section>
@@ -258,36 +229,6 @@ echo '<a id="top"></a>';
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                </div>
-            </section>
-
-            <!-- Emails Section -->
-            <section id="emails" class="content-section" style="display: none;">
-                <div class="content-header">
-                    <h1>Adresses email</h1>
-                    <p class="content-description">Gérez vos adresses email associées à ce compte.</p>
-                </div>
-
-                <div class="settings-group">
-                    <div class="email-list">
-                        <div class="email-item">
-                            <div class="email-info">
-                                <strong>user@example.com</strong>
-                                <div class="email-badges">
-                                    <span class="badge badge-primary">Principal</span>
-                                    <span class="badge badge-success">Vérifié</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn-secondary" onclick="addEmail()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                        </svg>
-                        Ajouter une adresse email
-                    </button>
                 </div>
             </section>
 

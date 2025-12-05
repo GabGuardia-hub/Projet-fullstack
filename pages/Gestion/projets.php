@@ -25,9 +25,9 @@ if (!$resultat) {
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/projet.css">
 </head>
-<body>
 
-<?php include '../nav/nav.php'; ?>
+<header><?php include '../nav/nav.php'; ?></header>
+<body>
 
 <main class="projects-page">
     <section class="projects-header">

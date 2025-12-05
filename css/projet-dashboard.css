@@ -21,6 +21,7 @@
         .promanage-dashboard {
             display: flex;
             min-height: 100vh;
+            padding-top: 80px; /* Ajout d'un padding en haut pour la barre de navigation */
             background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(14,165,233,0.08));
         }
 
@@ -29,13 +30,16 @@
             background: var(--pm-card);
             border-right: 1px solid var(--pm-border);
             box-shadow: 2px 0 20px rgba(15,23,42,0.08);
-            padding: 32px 0 40px;          /* plus de padding horizontal */
+            padding: 32px 0 40px;
             display: flex;
             flex-direction: column;
             gap: 32px;
-            position: sticky;
-            top: 0;
-            height: 100vh;
+            position: fixed;
+            top: 80px; /* Ajustement pour tenir compte de la hauteur de la navbar */
+            left: 0;
+            bottom: 0;
+            height: calc(100vh - 80px); /* Ajustement de la hauteur */
+            overflow-y: auto;
         }
 
         .sidebar-nav > div {
@@ -87,7 +91,8 @@
             flex-direction: column; 
             gap: 16px; 
             flex: 1; 
-            overflow-y: auto; }
+            overflow-y: auto;
+        }
 
         .nav-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--pm-muted); }
         .nav-item { 
@@ -127,7 +132,13 @@
         .sidebar-btn.primary { background: linear-gradient(135deg, var(--pm-primary), var(--pm-primary-dark)); color: #fff; }
         .sidebar-btn.ghost { border-color: var(--pm-border); color: var(--pm-text); }
 
-        .dashboard-main { flex: 1; padding: 48px clamp(24px, 5vw, 72px); }
+        .dashboard-main { 
+            flex: 1; 
+            padding: 20px 40px 40px calc(var(--pm-sidebar-width) + 40px);
+            margin-left: 0;
+            margin-top: 0;
+            min-height: calc(100vh - 80px);
+        }
         .card, .panel { background: var(--pm-card); border-radius: 28px; padding: clamp(24px, 4vw, 36px); box-shadow: 0 25px 45px rgba(15,23,42,0.08); }
         .main-header { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
         .header-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }

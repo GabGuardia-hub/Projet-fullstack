@@ -21,25 +21,27 @@
         .promanage-dashboard {
             display: flex;
             min-height: 100vh;
-            padding-top: 80px; /* Ajout d'un padding en haut pour la barre de navigation */
             background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(14,165,233,0.08));
+            padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .dashboard-sidebar {
             width: var(--pm-sidebar-width);
             background: var(--pm-card);
-            border-right: 1px solid var(--pm-border);
-            box-shadow: 2px 0 20px rgba(15,23,42,0.08);
-            padding: 32px 0 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 32px;
-            position: fixed;
-            top: 80px; /* Ajustement pour tenir compte de la hauteur de la navbar */
-            left: 0;
-            bottom: 0;
-            height: calc(100vh - 80px); /* Ajustement de la hauteur */
-            overflow-y: auto;
+            gap: 24px;
+            height: fit-content;
+            margin-right: 24px;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+            z-index: 10;
         }
 
         .sidebar-nav > div {
@@ -134,10 +136,12 @@
 
         .dashboard-main { 
             flex: 1; 
-            padding: 20px 40px 40px calc(var(--pm-sidebar-width) + 40px);
-            margin-left: 0;
-            margin-top: 0;
-            min-height: calc(100vh - 80px);
+            background: var(--pm-card);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 5;
         }
         .card, .panel { background: var(--pm-card); border-radius: 28px; padding: clamp(24px, 4vw, 36px); box-shadow: 0 25px 45px rgba(15,23,42,0.08); }
         .main-header { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
@@ -199,6 +203,20 @@
         }
 
         @media (max-width: 1024px) {
+            .promanage-dashboard {
+                flex-direction: column;
+            }
+            
+            .dashboard-sidebar {
+                width: 100%;
+                position: static;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .dashboard-main {
+                width: 100%;
+            }
             .promanage-dashboard { flex-direction: column; }
             .dashboard-sidebar { width: 100%; position: static; height: auto; }
         }

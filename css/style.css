@@ -22,15 +22,18 @@ body {
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
+    padding-top: 80px; /* Ajout d'un padding en haut pour éviter que le contenu ne soit caché sous la navbar */
 }
 
 header {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     background: #ffffff;
     backdrop-filter: blur(18px);
     box-shadow: 0 12px 30px rgba(20, 14, 53, 0.05);
-    z-index: 10;
+    z-index: 1000;
 }
 
 .top-nav {
